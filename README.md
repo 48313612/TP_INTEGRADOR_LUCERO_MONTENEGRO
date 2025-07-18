@@ -1,14 +1,14 @@
 # TP INTEGRADOR
 
 ## BACKEND
---> Instalar
+### Instalar
   npm i
---> Correr
+### Correr
   npm run server
 
 ## FRONTEND
---> Instalar
+### Instalar
   npm i
---> Correr
+### Correr
   npm run dev
   
