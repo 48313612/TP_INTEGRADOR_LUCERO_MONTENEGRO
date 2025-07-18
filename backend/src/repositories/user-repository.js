@@ -2,9 +2,14 @@ import pool from '../configs/db-config.js';
 import User from '../entities/user.js';
 
 export default class UserRepository {
- 
   async getUserByUsername(username) {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    if (result.rows.length === 0) return null;
+    return new User(result.rows[0]);
+  }
+
+  async getUserByUsernameAndPassword(username, password) {
+    const result = await pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
     if (result.rows.length === 0) return null;
     return new User(result.rows[0]);
   }

@@ -1,7 +1,7 @@
 export function validarUser (text) {
     const textValido = /^[a-z0-9]+@(gmail|hotmail|outlook)\.com$/.test(text);
     if (text.trim().length === 0) return "Campo requerido.";
-    if (!textValido) return "Ingrese un email válido.";
+    if (!textValido) return "Ingrese un username válido.";
     return '';
   }
 

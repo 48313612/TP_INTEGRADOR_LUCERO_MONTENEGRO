@@ -4,7 +4,7 @@ import { validarUser, validarTexto, validarContrasena } from '../helpers/validac
 import jwt from 'jsonwebtoken';
 
 const repo = new UserRepository();
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export default class UserService {
   async registerUser({ first_name, last_name, username, password }) {
@@ -30,12 +30,52 @@ export default class UserService {
     }
     const newUser = new User({ first_name, last_name, username, password });
     const createdUser = await repo.createUser(newUser);
-    // Generar token JWT
+
     const token = jwt.sign(
       { id: createdUser.id, username: createdUser.username, first_name: createdUser.first_name, last_name: createdUser.last_name },
       JWT_SECRET,
       { expiresIn: '2h' }
     );
     return { user: createdUser, token };
+  }
+
+  async loginUser({ username, password }) {
+    const emailError = validarUser(username);
+    if (emailError) {
+      return {
+        status: 400,
+        response: {
+          success: false,
+          message: emailError,
+          token: ''
+        }
+      };
+    }
+
+    const user = await repo.getUserByUsernameAndPassword(username, password);
+    if (!user) {
+      return {
+        status: 401,
+        response: {
+          success: false,
+          message: 'Usuario o clave inválida.',
+          token: ''
+        }
+      };
+    }
+
+    const token = jwt.sign(
+      { id: user.id, first_name: user.first_name, last_name: user.last_name, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+    return {
+      status: 200,
+      response: {
+        success: true,
+        message: '',
+        token
+      }
+    };
   }
 } 
