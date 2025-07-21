@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import UserRepository from '../repositories/user-repository.js';
+import { validarUser, validarTexto, validarContrasena } from '../helpers/validaciones.js';
 
 class AuthService {
     constructor() {
@@ -20,56 +21,60 @@ class AuthService {
 
     async register(userData) {
         const { first_name, last_name, username, password } = userData;
-        
-        // Validations
-        if (!first_name || first_name.trim().length < 3) {
-            throw new Error('El nombre debe tener al menos 3 caracteres.');
+        const nombreError = validarTexto(first_name);
+        if (nombreError) {
+            throw new Error(nombreError);
         }
         
-        if (!last_name || last_name.trim().length < 3) {
-            throw new Error('El apellido debe tener al menos 3 caracteres.');
+        const apellidoError = validarTexto(last_name);
+        if (apellidoError) {
+            throw new Error(apellidoError);
         }
         
-        if (!this.isValidEmail(username)) {
-            throw new Error('El email es invalido.');
+        const emailError = validarUser(username);
+        if (emailError) {
+            throw new Error(emailError);
         }
         
-        if (!password || password.trim().length < 3) {
-            throw new Error('La contraseña debe tener al menos 3 caracteres.');
+        const contrasenaError = validarContrasena(password);
+        if (contrasenaError) {
+            throw new Error(contrasenaError);
         }
         
-        // Check if username already exists
         const userExists = await this.userRepository.checkUsernameExists(username);
         if (userExists) {
             throw new Error('El usuario ya existe.');
         }
         
-        // Create user
-        const newUser = await this.userRepository.createUser(userData);
-        return newUser;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const userDataConContrasenaCifrada = {
+            ...userData,
+            password: hashedPassword
+        };
+        
+        const nuevoUser = await this.userRepository.createUser(userDataConContrasenaCifrada);
+        return nuevoUser;
     }
 
     async login(credentials) {
         const { username, password } = credentials;
         
-        // Validate email format
-        if (!this.isValidEmail(username)) {
-            throw new Error('El email es invalido.');
+        const emailError = validarUser(username);
+        if (emailError) {
+            throw new Error(emailError);
         }
         
-        // Find user
         const user = await this.userRepository.findByUsername(username);
         if (!user) {
             throw new Error('Usuario o clave inválida.');
         }
         
-        // Verify password
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
+        const validarContrasena = await bcrypt.compare(password, user.password);
+        if (!validarContrasena) {
             throw new Error('Usuario o clave inválida.');
         }
         
-        // Generate token
         const token = this.generateToken(user);
         
         return {
@@ -81,11 +86,6 @@ class AuthService {
             },
             token
         };
-    }
-
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
     }
 
     verifyToken(token) {

@@ -1,6 +1,7 @@
-import AuthService from '../services/auth-service.js';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
-const authService = new AuthService();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -13,7 +14,7 @@ export const authenticateToken = (req, res, next) => {
     }
     
     try {
-        const decoded = authService.verifyToken(token);
+        const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {

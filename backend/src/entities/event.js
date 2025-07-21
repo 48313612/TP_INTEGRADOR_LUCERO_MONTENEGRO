@@ -8,8 +8,35 @@ class Event{
         this.price = price;
         this.enabled_for_enrollment = enabled_for_enrollment;
         this.max_assistance = max_assistance;
-        this.creator_user = creator_user;
-        this.event_location = event_location;
+        
+        // Simplify creator_user object to show only required fields
+        this.creator_user = {
+            id: creator_user.id,
+            first_name: creator_user.first_name,
+            last_name: creator_user.last_name,
+            username: creator_user.username
+        };
+        
+        // Simplify event_location object to show only required fields
+        this.event_location = {
+            id: event_location.id,
+            id_location: event_location.id_location,
+            location: {
+                id: event_location.location.id,
+                name: event_location.location.name,
+                full_address: event_location.location.full_address,
+                latitude: event_location.location.latitude,
+                longitude: event_location.location.longitude,
+                id_province: event_location.location.id_province,
+                province: {
+                    id: event_location.location.province.id,
+                    name: event_location.location.province.name,
+                    full_name: event_location.location.province.full_name,
+                    latitude: event_location.location.province.latitude,
+                    longitude: event_location.location.province.longitude
+                }
+            }
+        };
     }
 }
 

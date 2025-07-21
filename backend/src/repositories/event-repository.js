@@ -86,16 +86,17 @@ export default class EventRepository {
         u.id as creator_user_id, u.first_name as creator_first_name, u.last_name as creator_last_name, u.username as creator_username, u.password as creator_password,
         el.id as event_location_id, el.id_location, el.name as event_location_name, el.full_address, el.max_capacity, el.latitude as event_location_latitude, el.longitude as event_location_longitude, el.id_creator_user as event_location_creator_user,
         l.id as location_id, l.name as location_name, l.id_province, l.latitude as location_latitude, l.longitude as location_longitude,
-        p.id as province_id, p.name as province_name, p.full_name as province_full_name, p.latitude as province_latitude, p.longitude as province_longitude, p.display_order
+        p.id as province_id, p.name as province_name, p.full_name as province_full_name, p.latitude as province_latitude, p.longitude as province_longitude, p.display_order,
+        elu.id as event_location_creator_id, elu.first_name as event_location_creator_first_name, elu.last_name as event_location_creator_last_name, elu.username as event_location_creator_username, elu.password as event_location_creator_password
       FROM events e
       JOIN users u ON e.id_creator_user = u.id
       JOIN event_locations el ON e.id_event_location = el.id
+      JOIN users elu ON el.id_creator_user = elu.id
       JOIN locations l ON el.id_location = l.id
       JOIN provinces p ON l.id_province = p.id
       WHERE e.id = $1`;
       const result = await pool.query(sql, [id]);
       if (result.rows.length === 0) return null;
-      // Traer tags aparte
       const tagsSql = `SELECT t.id, t.name FROM event_tags et JOIN tags t ON et.id_tag = t.id WHERE et.id_event = $1`;
       const tagsResult = await pool.query(tagsSql, [id]);
       return { ...result.rows[0], tags: tagsResult.rows };
@@ -105,4 +106,149 @@ export default class EventRepository {
     }
   }
 
+  getEventLocationById = async (id) => {
+    try {
+      const sql = `SELECT * FROM event_locations WHERE id = $1`;
+      const result = await pool.query(sql, [id]);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  checkEventExistsByName = async (name) => {
+    try {
+      const sql = `SELECT id FROM events WHERE LOWER(name) = LOWER($1)`;
+      const result = await pool.query(sql, [name]);
+      return result.rows.length > 0;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  createEvent = async (eventData) => {
+    try {
+      const sql = `INSERT INTO events (name, description, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user, id_event_location) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
+      const values = [
+        eventData.name,
+        eventData.description,
+        eventData.start_date,
+        eventData.duration_in_minutes,
+        eventData.price,
+        eventData.enabled_for_enrollment,
+        eventData.max_assistance,
+        eventData.id_creator_user,
+        eventData.id_event_location
+      ];
+      const result = await pool.query(sql, values);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  updateEvent = async (eventId, eventData) => {
+    try {
+      const existingEvent = await this.getEventById(eventId);
+      if (!existingEvent) {
+        throw new Error('Evento no encontrado.');
+      }
+
+      const updateFields = [];
+      const values = [];
+      let paramIndex = 1;
+
+      if (eventData.name !== undefined) {
+        updateFields.push(`name = $${paramIndex}`);
+        values.push(eventData.name);
+        paramIndex++;
+      }
+
+      if (eventData.description !== undefined) {
+        updateFields.push(`description = $${paramIndex}`);
+        values.push(eventData.description);
+        paramIndex++;
+      }
+
+      if (eventData.start_date !== undefined) {
+        updateFields.push(`start_date = $${paramIndex}`);
+        values.push(eventData.start_date);
+        paramIndex++;
+      }
+
+      if (eventData.duration_in_minutes !== undefined) {
+        updateFields.push(`duration_in_minutes = $${paramIndex}`);
+        values.push(eventData.duration_in_minutes);
+        paramIndex++;
+      }
+
+      if (eventData.price !== undefined) {
+        updateFields.push(`price = $${paramIndex}`);
+        values.push(eventData.price);
+        paramIndex++;
+      }
+
+      if (eventData.enabled_for_enrollment !== undefined) {
+        updateFields.push(`enabled_for_enrollment = $${paramIndex}`);
+        values.push(eventData.enabled_for_enrollment);
+        paramIndex++;
+      }
+
+      if (eventData.max_assistance !== undefined) {
+        updateFields.push(`max_assistance = $${paramIndex}`);
+        values.push(eventData.max_assistance);
+        paramIndex++;
+      }
+
+      if (eventData.id_event_location !== undefined) {
+        updateFields.push(`id_event_location = $${paramIndex}`);
+        values.push(eventData.id_event_location);
+        paramIndex++;
+      }
+
+      if (updateFields.length === 0) {
+        return existingEvent;
+      }
+
+      values.push(eventId);
+      const sql = `UPDATE events SET ${updateFields.join(', ')} WHERE id = $${paramIndex} RETURNING *`;
+      const result = await pool.query(sql, values);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  deleteEvent = async (eventId) => {
+    try {
+      await pool.query('DELETE FROM event_tags WHERE id_event = $1', [eventId]);
+      
+      const sql = 'DELETE FROM events WHERE id = $1 RETURNING *';
+      const result = await pool.query(sql, [eventId]);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  checkEventEnrollments = async (eventId) => {
+    try {
+      // Verificar si existe una tabla de inscripciones
+      // Por ahora, asumimos que no hay inscripciones para permitir la eliminación
+      // En el futuro, esto se puede implementar con una tabla event_enrollments
+      const sql = `SELECT COUNT(*) FROM event_enrollments WHERE id_event = $1`;
+      const result = await pool.query(sql, [eventId]);
+      return result.rows[0].count > 0;
+    } catch (error) {
+      // Si la tabla no existe, asumimos que no hay inscripciones
+      console.log('Tabla event_enrollments no encontrada, asumiendo sin inscripciones');
+      return false;
+    }
+  }
 }

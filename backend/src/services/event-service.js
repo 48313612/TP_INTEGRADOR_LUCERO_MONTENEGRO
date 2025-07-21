@@ -4,6 +4,7 @@ import User from '../entities/user.js';
 import EventLocation from '../entities/event-location.js';
 import Location from '../entities/location.js';
 import Province from '../entities/province.js';
+import { maskPassword, validarTexto, validarNum, validarFecha } from '../helpers/validaciones.js';
 
 const repo = new EventRepository();
 
@@ -101,7 +102,7 @@ export default class EventService{
   getEventById = async (id) => {
     const row = await repo.getEventById(id);
     if (!row) return null;
-    // Armar estructura anidada
+    
     const province = new Province({
       id: row.province_id,
       name: row.province_name,
@@ -110,6 +111,7 @@ export default class EventService{
       longitude: row.province_longitude,
       display_order: row.display_order
     });
+    
     const location = new Location({
       id: row.location_id,
       name: row.location_name,
@@ -118,6 +120,7 @@ export default class EventService{
       longitude: row.location_longitude,
       province
     });
+    
     const eventLocation = {
       id: row.event_location_id,
       id_location: row.id_location,
@@ -129,17 +132,22 @@ export default class EventService{
       id_creator_user: row.event_location_creator_user,
       location,
       creator_user: {
-        id: row.event_location_creator_user,
-        // Si quieres traer más datos del usuario creador del lugar, deberías hacer otro join
+        id: row.event_location_creator_id,
+        first_name: row.event_location_creator_first_name,
+        last_name: row.event_location_creator_last_name,
+        username: row.event_location_creator_username,
+        password: maskPassword(row.event_location_creator_password)
       }
     };
+    
     const creatorUser = {
       id: row.creator_user_id,
       first_name: row.creator_first_name,
       last_name: row.creator_last_name,
       username: row.creator_username,
-      password: row.creator_password
+      password: maskPassword(row.creator_password)
     };
+    
     return {
       id: row.id,
       name: row.name,
@@ -155,5 +163,115 @@ export default class EventService{
       tags: row.tags,
       creator_user: creatorUser
     };
+  }
+
+  createEvent = async (eventData, userId) => {
+
+    const nameError = validarTexto(eventData.name);
+    if (nameError) {
+      throw new Error("Nombre: " + nameError);
+    }
+
+    const descriptionError = validarTexto(eventData.description);
+    if (descriptionError) {
+      throw new Error("Descripción: " + descriptionError);
+    }
+    const precioError = validarNum(eventData.price);
+    if (precioError) {
+      throw new Error(precioError);
+    }
+
+    const durationError = validarNum(eventData.duration_in_minutes);
+    if (durationError) {
+      throw new Error(durationError);
+    }
+
+    const fechaError = validarFecha(eventData.start_date);
+    if (fechaError) {
+      throw new Error(fechaError);
+    }
+
+    // Verificar si ya existe un evento con el mismo nombre
+    const eventExists = await repo.checkEventExistsByName(eventData.name);
+    if (eventExists) {
+      throw new Error('Ya existe un evento con ese nombre.');
+    }
+
+    const eventLocation = await repo.getEventLocationById(eventData.id_event_location);
+    if (!eventLocation) {
+      throw new Error('La ubicación del evento no existe.');
+    }
+
+    if (eventData.max_assistance > eventLocation.max_capacity) {
+      throw new Error('El max_assistance no puede ser mayor que el max_capacity de la ubicación del evento.');
+    }
+
+    const eventoConCreador = {
+      ...eventData,
+      id_creator_user: userId
+    };
+
+    return await repo.createEvent(eventoConCreador);
+  }
+
+  updateEvent = async (eventId, eventData, userId) => {
+    const existingEvent = await repo.getEventById(eventId);
+    if (!existingEvent) {
+      throw new Error('Evento no encontrado.');
+    }
+
+    if (existingEvent.id_creator_user !== userId) {
+      throw new Error('No tienes permisos para editar este evento.');
+    }
+
+    if (eventData.name) {
+      const nameError = validarTexto(eventData.name);
+      if (nameError) {
+        throw new Error('El name debe tener al menos 3 letras y contener solo letras y espacios.');
+      }
+    }
+
+    if (eventData.description) {
+      const descriptionError = validarTexto(eventData.description);
+      if (descriptionError) {
+        throw new Error('La description debe tener al menos 3 letras y contener solo letras y espacios.');
+      }
+    }
+
+    if (eventData.price !== undefined && eventData.price < 0) {
+      throw new Error('El price debe ser mayor o igual a cero.');
+    }
+
+    if (eventData.duration_in_minutes !== undefined && eventData.duration_in_minutes < 0) {
+      throw new Error('La duration_in_minutes debe ser mayor o igual a cero.');
+    }
+
+    if (eventData.max_assistance !== undefined) {
+      const eventLocation = await repo.getEventLocationById(eventData.id_event_location || existingEvent.id_event_location);
+      if (eventData.max_assistance > eventLocation.max_capacity) {
+        throw new Error('El max_assistance no puede ser mayor que el max_capacity de la ubicación del evento.');
+      }
+    }
+
+    return await repo.updateEvent(eventId, eventData);
+  }
+
+  deleteEvent = async (eventId, userId) => {
+    const existingEvent = await repo.getEventById(eventId);
+    if (!existingEvent) {
+      throw new Error('Evento no encontrado.');
+    }
+
+    if (existingEvent.id_creator_user !== userId) {
+      throw new Error('No tienes permisos para eliminar este evento.');
+    }
+
+    
+    const hasEnrollments = await repo.checkEventEnrollments(eventId);
+    if (hasEnrollments) {
+      throw new Error('No se puede eliminar el evento porque existe al menos un usuario registrado al evento.');
+    }
+
+    return await repo.deleteEvent(eventId);
   }
 }
