@@ -9,8 +9,8 @@ import { maskPassword, validarTexto, validarNum, validarFecha } from '../helpers
 const repo = new EventRepository();
 
 export default class EventService{
-  getAllEvents = async () => {
-    const rows = await repo.getAllEvents();
+  getAllEvents = async (page = 1, limit = 10) => {
+    const rows = await repo.getAllEvents(page, limit);
     return rows.map(row => {
       const province = new Province({
         id: row.province_id,
@@ -273,5 +273,13 @@ export default class EventService{
     }
 
     return await repo.deleteEvent(eventId);
+  }
+
+  enrollUserToEvent = async (eventId, userId) => {
+    return await repo.enrollUserToEvent(eventId, userId);
+  }
+
+  removeUserFromEvent = async (eventId, userId) => {
+    return await repo.removeUserFromEvent(eventId, userId);
   }
 }

@@ -7,12 +7,14 @@ const router = express.Router();
 
 router.get('', async (req, res) => {
   let respuesta;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
   const { name, startdate, tag } = req.query;
   let events;
   if (name || startdate || tag) {
-    events = await svc.searchEvents({ name, startdate, tag });
+    events = await svc.searchEvents({ name, startdate, tag }, page, limit);
   } else {
-    events = await svc.getAllEvents();
+    events = await svc.getAllEvents(page, limit);
   }
   if (events && events.length > 0) {
     respuesta = res.status(200).json(events);
@@ -108,6 +110,51 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: error.message });
     }
     if (error.message.includes('usuarios registrados')) {
+      return res.status(400).json({ error: error.message });
+    }
+    if (error.message.includes('Evento no encontrado')) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Enrollment endpoints
+router.post('/:id/enrollment', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const enrollment = await svc.enrollUserToEvent(id, userId);
+    res.status(201).json({ message: 'Usuario registrado exitosamente al evento', enrollment });
+  } catch (error) {
+    if (error.message.includes('ya se encuentra registrado') || 
+        error.message.includes('no está habilitado') ||
+        error.message.includes('excedido la capacidad máxima') ||
+        error.message.includes('ya sucedió o es hoy')) {
+      return res.status(400).json({ error: error.message });
+    }
+    if (error.message.includes('Evento no encontrado')) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/:id/enrollment', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const removed = await svc.removeUserFromEvent(id, userId);
+    if (removed) {
+      res.status(200).json({ message: 'Usuario removido exitosamente del evento', enrollment: removed });
+    } else {
+      res.status(404).json({ error: 'Evento no encontrado' });
+    }
+  } catch (error) {
+    if (error.message.includes('no se encuentra registrado') ||
+        error.message.includes('ya sucedió o es hoy')) {
       return res.status(400).json({ error: error.message });
     }
     if (error.message.includes('Evento no encontrado')) {

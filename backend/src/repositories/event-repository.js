@@ -4,8 +4,9 @@ const {Client, Pool} = pkg;
 
 
 export default class EventRepository {
-  getAllEvents = async () => {
+  getAllEvents = async (page = 1, limit = 10) => {
     try {
+      const offset = (page - 1) * limit;
       const sql = `SELECT 
         e.id as event_id, e.name as event_name, e.description as event_description, e.start_date, e.duration_in_minutes, e.price, 
         e.enabled_for_enrollment, e.max_assistance,
@@ -19,8 +20,9 @@ export default class EventRepository {
       JOIN locations l ON el.id_location = l.id
       JOIN provinces p ON l.id_province = p.id
       ORDER BY e.start_date ASC
+      LIMIT $1 OFFSET $2
     `;
-    const result = await pool.query(sql);
+    const result = await pool.query(sql, [limit, offset]);
     return result.rows;
     } 
     catch (error) {
@@ -239,16 +241,113 @@ export default class EventRepository {
 
   checkEventEnrollments = async (eventId) => {
     try {
-      // Verificar si existe una tabla de inscripciones
-      // Por ahora, asumimos que no hay inscripciones para permitir la eliminación
-      // En el futuro, esto se puede implementar con una tabla event_enrollments
       const sql = `SELECT COUNT(*) FROM event_enrollments WHERE id_event = $1`;
       const result = await pool.query(sql, [eventId]);
-      return result.rows[0].count > 0;
+      return parseInt(result.rows[0].count) > 0;
     } catch (error) {
-      // Si la tabla no existe, asumimos que no hay inscripciones
-      console.log('Tabla event_enrollments no encontrada, asumiendo sin inscripciones');
+      console.log('Error checking event enrollments:', error);
       return false;
+    }
+  }
+
+  enrollUserToEvent = async (eventId, userId) => {
+    try {
+      // Check if user is already enrolled
+      const existingEnrollment = await this.getUserEnrollment(eventId, userId);
+      if (existingEnrollment) {
+        throw new Error('El usuario ya se encuentra registrado en el evento.');
+      }
+
+      // Check if event exists and is enabled for enrollment
+      const event = await this.getEventById(eventId);
+      if (!event) {
+        throw new Error('Evento no encontrado.');
+      }
+
+      if (!event.enabled_for_enrollment) {
+        throw new Error('El evento no está habilitado para la inscripción.');
+      }
+
+      // Check if event has already started or is today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const eventDate = new Date(event.start_date);
+      eventDate.setHours(0, 0, 0, 0);
+      
+      if (eventDate <= today) {
+        throw new Error('No se puede registrar a un evento que ya sucedió o es hoy.');
+      }
+
+      // Check if event has reached max capacity
+      const currentEnrollments = await this.getEventEnrollmentsCount(eventId);
+      if (currentEnrollments >= event.max_assistance) {
+        throw new Error('El evento ha excedido la capacidad máxima de registrados.');
+      }
+
+      // Create enrollment
+      const registrationDateTime = new Date();
+      const sql = `INSERT INTO event_enrollments (id_event, id_user, registration_date_time) 
+                    VALUES ($1, $2, $3) RETURNING *`;
+      const result = await pool.query(sql, [eventId, userId, registrationDateTime]);
+      return result.rows[0];
+    } catch (error) {
+      console.log('Error enrolling user to event:', error);
+      throw error;
+    }
+  }
+
+  removeUserFromEvent = async (eventId, userId) => {
+    try {
+      // Check if user is enrolled
+      const existingEnrollment = await this.getUserEnrollment(eventId, userId);
+      if (!existingEnrollment) {
+        throw new Error('El usuario no se encuentra registrado al evento.');
+      }
+
+      // Check if event has already started or is today
+      const event = await this.getEventById(eventId);
+      if (!event) {
+        throw new Error('Evento no encontrado.');
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const eventDate = new Date(event.start_date);
+      eventDate.setHours(0, 0, 0, 0);
+      
+      if (eventDate <= today) {
+        throw new Error('No se puede remover de un evento que ya sucedió o es hoy.');
+      }
+
+      // Remove enrollment
+      const sql = `DELETE FROM event_enrollments WHERE id_event = $1 AND id_user = $2 RETURNING *`;
+      const result = await pool.query(sql, [eventId, userId]);
+      return result.rows[0];
+    } catch (error) {
+      console.log('Error removing user from event:', error);
+      throw error;
+    }
+  }
+
+  getUserEnrollment = async (eventId, userId) => {
+    try {
+      const sql = `SELECT * FROM event_enrollments WHERE id_event = $1 AND id_user = $2`;
+      const result = await pool.query(sql, [eventId, userId]);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.log('Error getting user enrollment:', error);
+      return null;
+    }
+  }
+
+  getEventEnrollmentsCount = async (eventId) => {
+    try {
+      const sql = `SELECT COUNT(*) FROM event_enrollments WHERE id_event = $1`;
+      const result = await pool.query(sql, [eventId]);
+      return parseInt(result.rows[0].count);
+    } catch (error) {
+      console.log('Error getting event enrollments count:', error);
+      return 0;
     }
   }
 }

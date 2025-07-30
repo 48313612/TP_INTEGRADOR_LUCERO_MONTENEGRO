@@ -4,6 +4,7 @@ import cors from "cors";
 import EventRouter from "./src/controllers/event-controller.js";
 import UserRouter from "./src/controllers/user-controller.js";
 import AuthRouter from "./src/controllers/auth-controller.js";
+import EventLocationRouter from "./src/controllers/event-location-controller.js";
 
 const app = express();
 const port = 3000;
@@ -18,6 +19,7 @@ app.get('/', (req, res) => {
 app.use('/api/event', EventRouter);
 app.use('/api/user', UserRouter);
 app.use('/api/auth', AuthRouter);
+app.use('/api/event-location', EventLocationRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

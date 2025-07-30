@@ -10,8 +10,6 @@ export function validarUser (text) {
     if (!text || typeof text !== 'string') return "Campo requerido.";
     if (text.trim().length === 0) return "Campo requerido.";
     if (text.trim().length < 3) return "Debe tener al menos 3 letras.";
-    const regexTexto = /^[A-Za-zÀ-ÿ\s.,!?;:()]+$/;
-    if (!regexTexto.test(text)) return "Solo letras, espacios y puntuación básica.";
     return '';
   };
 

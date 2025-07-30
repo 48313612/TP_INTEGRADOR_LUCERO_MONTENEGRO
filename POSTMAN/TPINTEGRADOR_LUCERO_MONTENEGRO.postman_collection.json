@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "cfb3151c-43b0-49f6-9f05-b4acffcf94d2",
+		"name": "TPINTEGRADOR_LUCERO_MONTENEGRO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43120473"
+	},
+	"item": [
+		{
+			"name": "Listado de Eventos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Búsqueda de un Evento",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event/?name=Obra de teatro “El viaje”",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event",
+						""
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Obra de teatro “El viaje”"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Detalle de un Evento",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event/9",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event",
+						"9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTMwNTI2MDEsImV4cCI6MTc1MzA1OTgwMX0.tjZy3Ep1PfYj1KDcM9WYyC3tBRq1jn6ka6AgWavzst4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"eugelucero@gmail.com\",\r\n    \"password\": \"Eugenia1234-\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrarse",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"first_name\": \"Juanita\",\r\n  \"last_name\": \"Pérez\",\r\n  \"username\": \"juanitaperez@outlook.com\",\r\n  \"password\": \"MiContrasenaSegura123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Evento",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTMwNTc3MDcsImV4cCI6MTc1MzA2NDkwN30.exVGqcxws8madXUM7oLin9V5hYajAMD027rPILDf_Hs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Taller de Fotografía Nocturna\",\r\n  \"description\": \"Aprendé a capturar imágenes impresionantes durante la noche. Requiere cámara con modo manual.\",\r\n  \"id_event_category\": 3,\r\n  \"id_event_location\": 17,\r\n  \"start_date\": \"2025-11-15T19:30:00\",\r\n  \"duration_in_minutes\": 120,\r\n  \"price\": 0,\r\n  \"enabled_for_enrollment\": true,\r\n  \"max_assistance\": 25,\r\n  \"id_creator_user\": 6\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar evento",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTMwNTc3MDcsImV4cCI6MTc1MzA2NDkwN30.exVGqcxws8madXUM7oLin9V5hYajAMD027rPILDf_Hs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"10\",\r\n  \"start_date\": \"2025-10-23T10:00:00\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar evento",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTMwNTc3MDcsImV4cCI6MTc1MzA2NDkwN30.exVGqcxws8madXUM7oLin9V5hYajAMD027rPILDf_Hs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar User a Evento",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTMwNTc3MDcsImV4cCI6MTc1MzA2NDkwN30.exVGqcxws8madXUM7oLin9V5hYajAMD027rPILDf_Hs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event/9/enrollment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event",
+						"9",
+						"enrollment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar registro de usuario a evento",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTMwNTc3MDcsImV4cCI6MTc1MzA2NDkwN30.exVGqcxws8madXUM7oLin9V5hYajAMD027rPILDf_Hs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event/9/enrollment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event",
+						"9",
+						"enrollment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Event Location",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTM4MzQ3NDUsImV4cCI6MTc1Mzg0MTk0NX0.S50RhBN0tarL-tQbqdbjqY2CmZbK8zaMT34IaGBbSQE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"id_location\": \"18\",\r\n        \"name\" : \"Museo\",\r\n        \"full_address\": \"QueMeImporta \",\r\n        \"max_capacity\": \"120\",\r\n        \"latitude\": \"27.827\",\r\n        \"longitude\": \"-76.982\",\r\n        \"id_creator_user\": \"6\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/event-location",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event-location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAll Event Locations",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTM4MzQ3NDUsImV4cCI6MTc1Mzg0MTk0NX0.S50RhBN0tarL-tQbqdbjqY2CmZbK8zaMT34IaGBbSQE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event-location",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event-location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetById Event Location",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTM4MzQ3NDUsImV4cCI6MTc1Mzg0MTk0NX0.S50RhBN0tarL-tQbqdbjqY2CmZbK8zaMT34IaGBbSQE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/event-location/18",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event-location",
+						"18"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Event Location",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTM4MzQ3NDUsImV4cCI6MTc1Mzg0MTk0NX0.S50RhBN0tarL-tQbqdbjqY2CmZbK8zaMT34IaGBbSQE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"max_capacity\": \"128\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/event-location/18",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event-location",
+						"18"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar Event Location",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYiLCJmaXJzdF9uYW1lIjoiZXVnZW5pYSIsImxhc3RfbmFtZSI6Imx1Y2VybyIsInVzZXJuYW1lIjoiZXVnZWx1Y2Vyb0BnbWFpbC5jb20iLCJpYXQiOjE3NTM4MzQ3NDUsImV4cCI6MTc1Mzg0MTk0NX0.S50RhBN0tarL-tQbqdbjqY2CmZbK8zaMT34IaGBbSQE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/event-location/18",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"event-location",
+						"18"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
