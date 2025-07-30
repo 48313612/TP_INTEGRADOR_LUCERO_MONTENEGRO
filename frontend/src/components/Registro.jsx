@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Registro() {
   const [datos, setDatos] = useState({
@@ -15,6 +17,10 @@ export default function Registro() {
     contraseña: false,
   });
 
+  const [errorGeneral, setErrorGeneral] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const navigate = useNavigate();
+
   const detectarCambios = (e) => {
     const { name, value } = e.target;
     setDatos((prev) => ({ ...prev, [name]: value }));
@@ -24,24 +30,14 @@ export default function Registro() {
     const regexTexto = /^[A-Za-zÀ-ÿ\s]+$/;
     return text.trim().length > 0 && regexTexto.test(text);
   };
-  const validarEmail = (email) => {
-    return /^[a-z0-9]+@(gmail|hotmail|outlook)\.com$/.test(email);
-  };
-  const validarContraseña = (contra) => {
-    return contra.trim().length >= 6;
-  };
+  const validarEmail = (email) => /^[a-z0-9]+@(gmail|hotmail|outlook)\.com$/.test(email);
+  const validarContraseña = (contra) => contra.trim().length >= 6;
 
-  const mostrarMensaje = () => {
-    const elem = document.getElementById("mensajeConfirmacion");
-    if (elem) elem.style.display = "block";
-  };
-  const ocultarMensaje = () => {
-    const elem = document.getElementById("mensajeConfirmacion");
-    if (elem) elem.style.display = "none";
-  };
-
-  const enviarFormulario = (e) => {
+  const enviarFormulario = async (e) => {
     e.preventDefault();
+    setErrorGeneral("");
+    setSuccessMsg("");
+
     const validoNombre = validarTexto(datos.nombre);
     const validoApellido = validarTexto(datos.apellido);
     const validoEmail = validarEmail(datos.email);
@@ -54,46 +50,87 @@ export default function Registro() {
       contraseña: !validoContraseña,
     });
 
-    if (validoNombre && validoApellido && validoEmail && validoContraseña) {
-      setDatos({
-        nombre: "",
-        apellido: "",
-        email: "",
-        contraseña: "",
+    if (!validoNombre || !validoApellido || !validoEmail || !validoContraseña) return;
+
+    try {
+      const res = await axios.post("/api/user/register", {
+        first_name: datos.nombre,
+        last_name: datos.apellido,
+        username: datos.email,
+        password: datos.contraseña,
       });
-      mostrarMensaje();
-      setTimeout(() => { ocultarMensaje(); }, 5000);
+
+      if (res.data.success) {
+        setSuccessMsg("Usuario registrado correctamente. Redirigiendo...");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        setErrorGeneral(res.data.message || "Error en el registro");
+      }
+    } catch (error) {
+      if (error.response) {
+        setErrorGeneral(error.response.data.message || "Error en el registro");
+      } else {
+        setErrorGeneral("Error de conexión con el servidor");
+      }
     }
   };
 
   return (
-    <>
-      <div>
-        <h2>Registro</h2>
-        <form onSubmit={enviarFormulario}>
-          <label>Nombre</label>
-          <input type="text" name="nombre" placeholder="Nombre" value={datos.nombre} onChange={detectarCambios} required />
-          {errores.nombre && ( <p style={{ color: "red" }}>Error. Ingrese un nombre válido.</p> )}
+    <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
+      <h2>Registro</h2>
 
-          <label>Apellido</label>
-          <input type="text" name="apellido" placeholder="Apellido" value={datos.apellido} onChange={detectarCambios} required />
-          {errores.apellido && ( <p style={{ color: "red" }}>Error. Ingrese un apellido válido.</p> )}
+      {errorGeneral && <p style={{ color: "red" }}>{errorGeneral}</p>}
+      {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
 
-          <label>Correo Electrónico</label>
-          <input type="email" name="email" placeholder="Correo electrónico" value={datos.email} onChange={detectarCambios} required />
-          {errores.email && ( <p style={{ color: "red" }}>Error. Ingrese un correo electrónico válido.</p> )}
+      <form onSubmit={enviarFormulario}>
+        <label>Nombre</label>
+        <input
+          type="text"
+          name="nombre"
+          placeholder="Nombre"
+          value={datos.nombre}
+          onChange={detectarCambios}
+          required
+        />
+        {errores.nombre && <p style={{ color: "red" }}>Ingrese un nombre válido.</p>}
 
-          <label>Contraseña</label>
-          <input type="password" name="contraseña" placeholder="Contraseña" value={datos.contraseña} onChange={detectarCambios} required  />
-          {errores.contraseña && ( <p style={{ color: "red" }}> Error. La contraseña debe tener al menos 6 caracteres. </p> )}
+        <label>Apellido</label>
+        <input
+          type="text"
+          name="apellido"
+          placeholder="Apellido"
+          value={datos.apellido}
+          onChange={detectarCambios}
+          required
+        />
+        {errores.apellido && <p style={{ color: "red" }}>Ingrese un apellido válido.</p>}
 
-          <button type="submit">Registrarme</button>
-        </form>
-      </div>
-      
-      <div id="mensajeConfirmacion" >
-        <p>Formulario enviado correctamente</p>
-      </div>
-    </>
+        <label>Correo Electrónico</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="Correo electrónico"
+          value={datos.email}
+          onChange={detectarCambios}
+          required
+        />
+        {errores.email && <p style={{ color: "red" }}>Ingrese un correo electrónico válido.</p>}
+
+        <label>Contraseña</label>
+        <input
+          type="password"
+          name="contraseña"
+          placeholder="Contraseña"
+          value={datos.contraseña}
+          onChange={detectarCambios}
+          required
+        />
+        {errores.contraseña && <p style={{ color: "red" }}>La contraseña debe tener al menos 6 caracteres.</p>}
+
+        <button type="submit" style={{ marginTop: 10 }}>
+          Registrarme
+        </button>
+      </form>
+    </div>
   );
 }

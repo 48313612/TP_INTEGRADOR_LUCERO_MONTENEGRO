@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default EventoCard = ({ evento }) => {
+const EventoCard = ({ evento }) => {
   const { name, description, start_date, duration_in_minutes, price, max_assistance, enabled_for_enrollment } = evento;
 
   return (
@@ -15,3 +15,5 @@ export default EventoCard = ({ evento }) => {
     </div>
   );
 };
+
+export default EventoCard;
