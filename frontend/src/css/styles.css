@@ -1,0 +1,144 @@
+/* styles.css */
+
+/* NAVBAR */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #1e1e2f;
+  padding: 1rem 2rem;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* Asegura que esté por encima del contenido */
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+  background-color: #343457;
+}
+
+/* Opcional: agregar espacio arriba al contenido principal */
+main, .content {
+  padding-top: 80px; /* Altura de la navbar + un poco más */
+}
+
+/* HOME */
+/* Home styles */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  padding-top: 100px; /* deja espacio por la navbar fija */
+  text-align: center;
+}
+
+.container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #9e9d9d;
+}
+
+.container p {
+  font-size: 1.2rem;
+  color: #777;
+}
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+
+/* EventoCard styles */
+
+.evento-card {
+  background-color: #414547;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(82, 67, 67, 0.08);
+  padding: 1.5rem;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 6px solid #9d9bb7; /* violeta elegante */
+}
+
+.evento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+.evento-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #bbbbe8;
+}
+
+.evento-card p {
+  margin: 0.4rem 0;
+  color: #f7f7f7;
+  font-size: 0.95rem;
+}
+
+
+/* AUTENTICACION USER */
+
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* ajustado por navbar fija */
+  background-color: #f0f2f5;
+  padding: 2rem;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 400px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.auth-toggle {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.auth-toggle button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #e4e4e4;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-toggle button:hover {
+  background-color: #d0d0d0;
+}
+
+.auth-toggle .active {
+  background-color: #4f46e5;
+  color: white;
+}
