@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import EventoCard from '../components/EventoCard';
+import '../css/styles.css';
 
 export default function BuscarEventos() {
   const [eventos, setEventos] = useState([]);
@@ -26,8 +27,9 @@ export default function BuscarEventos() {
 
       if (Array.isArray(data)) {
         setEventos(data);
-        setHasMore(data.length > 0); // simple detección para paginación
-      } else {
+        setHasMore(data.length > 0);
+      }
+      else {
         console.error('Error:', data.error || data);
       }
     } catch (error) {
@@ -39,18 +41,18 @@ export default function BuscarEventos() {
 
   useEffect(() => {
     fetchEventos();
-  }, [page]); // cargar al cambiar de página
+  }, [page]);
 
   const handleFiltrar = (e) => {
     e.preventDefault();
-    setPage(1); // reinicia a la primera página
+    setPage(1);
     fetchEventos();
   };
 
   return (
     <div className="container">
       <h1>Buscar Eventos</h1>
-
+      <div className="formBuscar">
       <form onSubmit={handleFiltrar} className="filtros-form">
         <input
           type="text"
@@ -74,6 +76,7 @@ export default function BuscarEventos() {
 
         <button type="submit">Filtrar</button>
       </form>
+      </div>
 
       {loading ? (
         <p>Cargando eventos...</p>

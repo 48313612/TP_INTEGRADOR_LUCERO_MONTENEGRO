@@ -8,14 +8,14 @@ export default function Registro() {
     nombre: "",
     apellido: "",
     email: "",
-    contraseña: "",
+    password: "",
   });
 
   const [errores, setErrores] = useState({
     nombre: false,
     apellido: false,
     email: false,
-    contraseña: false,
+    password: false,
   });
 
   const [errorGeneral, setErrorGeneral] = useState("");
@@ -32,7 +32,7 @@ export default function Registro() {
     return text.trim().length > 0 && regexTexto.test(text);
   };
   const validarEmail = (email) => /^[a-z0-9]+@(gmail|hotmail|outlook)\.com$/.test(email);
-  const validarContraseña = (contra) => contra.trim().length >= 6;
+  const validarpassword = (contra) => contra.trim().length >= 6;
 
   const enviarFormulario = async (e) => {
     e.preventDefault();
@@ -42,34 +42,34 @@ export default function Registro() {
     const validoNombre = validarTexto(datos.nombre);
     const validoApellido = validarTexto(datos.apellido);
     const validoEmail = validarEmail(datos.email);
-    const validoContraseña = validarContraseña(datos.contraseña);
+    const validopassword = validarpassword(datos.password);
 
     setErrores({
       nombre: !validoNombre,
       apellido: !validoApellido,
       email: !validoEmail,
-      contraseña: !validoContraseña,
+      password: !validopassword,
     });
 
-    if (!validoNombre || !validoApellido || !validoEmail || !validoContraseña) return;
+    if (!validoNombre || !validoApellido || !validoEmail || !validopassword) return;
 
     try {
-      const res = await axios.post("/api/user/register", {
+      const res = await axios.post('http://localhost:3000/api/user/register', {
         first_name: datos.nombre,
         last_name: datos.apellido,
         username: datos.email,
-        password: datos.contraseña,
+        password: datos.password,
       });
 
       if (res.data.success) {
         setSuccessMsg("Usuario registrado correctamente. Redirigiendo...");
-        setTimeout(() => navigate("/login"), 2000);
+        setTimeout(() => navigate('http://localhost:3000/api/user/login'), 2000);
       } else {
         setErrorGeneral(res.data.message || "Error en el registro");
       }
     } catch (error) {
       if (error.response) {
-        setErrorGeneral(error.response.data.message || "Error en el registro");
+        setErrorGeneral(error.response.data.error || "Error en el registro");
       } else {
         setErrorGeneral("Error de conexión con el servidor");
       }
@@ -77,13 +77,14 @@ export default function Registro() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
-      <h2>Registro</h2>
+    <div className="form-wrapper">
+      <div className="form-box">
+      <h1>Registro</h1>
 
       {errorGeneral && <p style={{ color: "red" }}>{errorGeneral}</p>}
       {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
 
-      <form onSubmit={enviarFormulario}>
+      <form className= "form-iniciar" onSubmit={enviarFormulario}>
         <label>Nombre</label>
         <input
           type="text"
@@ -117,21 +118,22 @@ export default function Registro() {
         />
         {errores.email && <p style={{ color: "red" }}>Ingrese un correo electrónico válido.</p>}
 
-        <label>Contraseña</label>
+        <label>password</label>
         <input
           type="password"
-          name="contraseña"
-          placeholder="Contraseña"
-          value={datos.contraseña}
+          name="password"
+          placeholder="password"
+          value={datos.password}
           onChange={detectarCambios}
           required
         />
-        {errores.contraseña && <p style={{ color: "red" }}>La contraseña debe tener al menos 6 caracteres.</p>}
+        {errores.password && <p style={{ color: "red" }}>La password debe tener al menos 6 caracteres.</p>}
 
         <button type="submit" style={{ marginTop: 10 }}>
           Registrarme
         </button>
       </form>
+    </div>
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default function Login() {
 
   const validarEmail = (email) =>
     /^[a-z0-9]+@(gmail|hotmail|outlook)\.com$/.test(email);
-  const validarContraseña = (pass) => pass.trim().length >= 6;
+  const validarContraseña = (pass) => pass.trim().length >= 4;
 
   const enviarFormulario = async (e) => {
     e.preventDefault();
@@ -31,15 +31,13 @@ export default function Login() {
     if (!validoEmail || !validoContraseña) return;
 
     try {
-      const res = await axios.post("/api/user/login", {
+      const res = await axios.post('http://localhost:3000/api/user/login', {
         username: datos.email,
         password: datos.contraseña,
       });
 
       if (res.data.success) {
-        // Guardar token directamente en localStorage
         localStorage.setItem("token", res.data.token);
-        // Redirigir a la página de eventos
         navigate("/eventos");
       } else {
         setErrorGeneral(res.data.message || "Error al iniciar sesión");
@@ -54,12 +52,13 @@ export default function Login() {
   };
 
   return (
-    <div >
-      <h2>Iniciar Sesión</h2>
+    <div className="form-wrapper">
+      <div className="form-box">
+      <h1>Iniciar Sesión</h1>
 
       {errorGeneral && <p style={{ color: "red" }}>{errorGeneral}</p>}
 
-      <form onSubmit={enviarFormulario}>
+      <form onSubmit={enviarFormulario} >
         <label>Correo Electrónico</label>
         <input
           type="email"
@@ -84,7 +83,7 @@ export default function Login() {
         />
         {errores.contraseña && (
           <p style={{ color: "red" }}>
-            La contraseña debe tener al menos 6 caracteres.
+            La contraseña debe tener al menos 4 caracteres.
           </p>
         )}
 
@@ -92,6 +91,7 @@ export default function Login() {
           Ingresar
         </button>
       </form>
+      </div>
     </div>
   );
 }
