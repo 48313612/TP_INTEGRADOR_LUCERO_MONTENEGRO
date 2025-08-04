@@ -84,7 +84,7 @@ export default function Registro() {
       {errorGeneral && <p style={{ color: "red" }}>{errorGeneral}</p>}
       {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
 
-      <form className= "form-iniciar" onSubmit={enviarFormulario}>
+      <form onSubmit={enviarFormulario}>
         <label>Nombre</label>
         <input
           type="text"

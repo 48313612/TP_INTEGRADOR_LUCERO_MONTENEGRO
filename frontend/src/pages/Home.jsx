@@ -29,7 +29,7 @@ export default function Home() {
       {eventos.length === 0 ? (
         <p>No hay eventos disponibles.</p>
       ) : (
-        <div className="eventos-grid">
+        <div className="cards-row-container">
           {eventos.map((evento) => (
             <EventoCard key={evento.id} evento={evento} />
           ))}
