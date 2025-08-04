@@ -60,8 +60,6 @@ export default function CrearEventoForm() {
 
     try {
       const token = localStorage.getItem("token");
-
-      // Decodificar token y extraer el id del usuario
       const payload = JSON.parse(atob(token.split(".")[1]));
       const userId = payload.id;
 
@@ -77,7 +75,7 @@ export default function CrearEventoForm() {
             ? parseInt(formData.max_assistance, 10)
             : null,
         id_event_location: parseInt(formData.id_event_location, 10),
-        creator_user: userId // ✅ Esto es lo que agregamos
+        creator_user: userId
       };
 
       const res = await axios.post('http://localhost:3000/api/event', body, {
@@ -108,11 +106,11 @@ export default function CrearEventoForm() {
 
   return (
     <div>
-    <h1> Creacion Evento</h1>
+    <h1> Creación Evento</h1>
     <form onSubmit={handleSubmit}>
       <input
         name="nombre"
-        placeholder="Nombre*"
+        placeholder="Nombre"
         value={formData.nombre}
         onChange={handleChange}
       />
@@ -125,21 +123,21 @@ export default function CrearEventoForm() {
       <input
         type="datetime-local"
         name="fecha"
-        placeholder="Fecha*"
+        placeholder="Fecha"
         value={formData.fecha}
         onChange={handleChange}
       />
       <input
         type="number"
         name="duracion"
-        placeholder="Duración (minutos)*"
+        placeholder="Duración (minutos)"
         value={formData.duracion}
         onChange={handleChange}
       />
       <input
         type="number"
         name="precio"
-        placeholder="Precio*"
+        placeholder="Precio"
         value={formData.precio}
         onChange={handleChange}
       />

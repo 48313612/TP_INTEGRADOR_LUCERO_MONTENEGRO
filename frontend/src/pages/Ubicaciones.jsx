@@ -76,10 +76,11 @@ export default function Ubicaciones() {
 
   return (
     <div className="container">
-      <h2>Crear nueva ubicación de evento</h2>
+      <h1> Ubicaciones</h1>
+      <h3>Crear nueva ubicación de evento</h3>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1rem' }}>
+      <div className= "ubicaciones" style={{  }}>
         <input
           type="text"
           placeholder="Nombre"
@@ -127,12 +128,12 @@ export default function Ubicaciones() {
       ) : ubicaciones.length === 0 ? (
         <p>No hay ubicaciones registradas aún.</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className='ubicaciones'>
           {ubicaciones.map((ubi) => (
-            <div key={ubi.id} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
+            <div className="evento-card" key={ubi.id}>
               <strong>{ubi.name}</strong>
               <p>Dirección: {ubi.full_address}</p>
-              <p>Capacidad máxima: {ubi.max_capacity}</p>
+              <p>Capacidad máxima: {ubi.max_capacity}</p> 
               <p>Latitud: {ubi.latitude}</p>
               <p>Longitud: {ubi.longitude}</p>
               <p>Provincia: {ubi.location?.province?.name || 'Sin provincia'}</p>

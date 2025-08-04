@@ -50,7 +50,7 @@ export default function BuscarEventos() {
   };
 
   return (
-    <div className="container">
+    <div className="buscador">
       <h1>Buscar Eventos</h1>
       <div className="formBuscar">
       <form onSubmit={handleFiltrar} className="filtros-form">
@@ -83,7 +83,7 @@ export default function BuscarEventos() {
       ) : eventos.length === 0 ? (
         <p>No hay eventos disponibles.</p>
       ) : (
-        <div className="eventos-grid">
+        <div className="cards-row-container">
           {eventos.map((evento) => (
             <EventoCard key={evento.id} evento={evento} />
           ))}

@@ -10,7 +10,7 @@ export default function CrearEventoForm() {
     precio: "",
     max_assistance: "",
     enabled_for_enrollment: true,
-    id_event_location: "", // guardamos el id seleccionado
+    id_event_location: "",
   });
 
   const [ubicaciones, setUbicaciones] = useState([]);
@@ -18,7 +18,6 @@ export default function CrearEventoForm() {
   const [mensaje, setMensaje] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Cargar ubicaciones al montar componente
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -63,10 +62,9 @@ export default function CrearEventoForm() {
         id_event_location: parseInt(formData.id_event_location, 10),
       };
 
-      // Aquí deberías enviar el token en headers si usas autenticación
       const res = await axios.post("http://localhost:3000/api/event", body, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // ejemplo
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 

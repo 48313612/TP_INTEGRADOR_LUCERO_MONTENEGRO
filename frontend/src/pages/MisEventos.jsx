@@ -70,10 +70,7 @@ export default function MisEventos() {
     }
   };
 
-  const handleEditar = (evento) => {
-    setEditandoId(evento.id);
-    setEventoEditado({ ...evento }); // Copia original
-  };
+  const handleEditar = (evento) => { setEditandoId(evento.id); setEventoEditado({ ...evento }); };
 
   const handleGuardar = async () => {
     const token = localStorage.getItem('token');

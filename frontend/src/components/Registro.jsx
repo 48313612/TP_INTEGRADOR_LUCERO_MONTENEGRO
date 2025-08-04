@@ -118,11 +118,11 @@ export default function Registro() {
         />
         {errores.email && <p style={{ color: "red" }}>Ingrese un correo electrónico válido.</p>}
 
-        <label>password</label>
+        <label>Contraseña</label>
         <input
           type="password"
           name="password"
-          placeholder="password"
+          placeholder="Contraseña"
           value={datos.password}
           onChange={detectarCambios}
           required

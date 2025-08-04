@@ -9,7 +9,7 @@ export default function DetalleEvento() {
   const [error, setError] = useState('');
   const [inscripto, setInscripto] = useState(false);
   const token = localStorage.getItem('token');
-  const userId = localStorage.getItem('userId'); // ⚠️ Este ID debe guardarse al hacer login
+  const userId = localStorage.getItem('userId');
 
   useEffect(() => {
     const fetchEvento = async () => {
@@ -18,13 +18,11 @@ export default function DetalleEvento() {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         setEvento(res.data);
-        setInscripto(res.data.user_enrolled || false); // Requiere que el backend lo devuelva
+        setInscripto(res.data.user_enrolled || false);
       } catch (err) {
-        console.log(err);
         setError('Error al obtener el evento');
       }
     };
-
     fetchEvento();
   }, [id, token]);
 
@@ -51,8 +49,7 @@ export default function DetalleEvento() {
     } catch (err) {
       console.log(err.response?.data || err.message);
       const msg = err.response?.data?.error;
-
-      // Detectar intento de inscripción a evento propio
+      
       if (msg === 'No puedes inscribirte a tu propio evento') {
         setError('No puedes inscribirte a tu propio evento.');
       } else {
