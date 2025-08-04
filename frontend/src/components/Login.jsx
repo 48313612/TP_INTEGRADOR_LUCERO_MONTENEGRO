@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../css/styles.css';
+import Home from '../pages/Home';
 
 export default function Login() {
   const [datos, setDatos] = useState({ email: "", contraseña: "" });
@@ -38,7 +39,7 @@ export default function Login() {
 
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
-        navigate("/eventos");
+        navigate('/');
       } else {
         setErrorGeneral(res.data.message || "Error al iniciar sesión");
       }
@@ -87,9 +88,7 @@ export default function Login() {
           </p>
         )}
 
-        <button type="submit">
-          Ingresar
-        </button>
+        <button type="submit"> Ingresar </button>
       </form>
       </div>
     </div>

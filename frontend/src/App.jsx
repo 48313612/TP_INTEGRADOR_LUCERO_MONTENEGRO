@@ -14,16 +14,14 @@ export default function App() {
     <>
     <HashRouter>
     <Navbar />
-    <Routes> 
-        <Route path="/">
-          <Route path="/" element={<Home />} />
-          <Route path="/AutenticacionUser" element={<AutenticacionUser />}> </Route>
-          <Route path="/BuscarEventos" element={<BuscarEventos />}></Route>
-          <Route path="/eventos/:id" element={<DetalleEvento />} />
-          <Route path="/MisEventos" element={<MisEventos />}></Route>
-          <Route path="/CrearEventoForm" element={<CrearEventoForm />}></Route>
-          <Route path="/Ubicaciones" element={<Ubicaciones />}></Route>
-        </Route>
+    <Routes>           
+        <Route path="/" element={<Home />} />
+        <Route path="/AutenticacionUser" element={<AutenticacionUser />}> </Route>
+        <Route path="/BuscarEventos" element={<BuscarEventos />}></Route>
+        <Route path="/eventos/:id" element={<DetalleEvento />} />
+        <Route path="/MisEventos" element={<MisEventos />}></Route>
+        <Route path="/CrearEventoForm" element={<CrearEventoForm />}></Route>
+        <Route path="/Ubicaciones" element={<Ubicaciones />}></Route>
    </Routes>
    </HashRouter>
    </>

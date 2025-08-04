@@ -107,6 +107,8 @@ export default function CrearEventoForm() {
   };
 
   return (
+    <div>
+    <h1> Creacion Evento</h1>
     <form onSubmit={handleSubmit}>
       <input
         name="nombre"
@@ -179,5 +181,6 @@ export default function CrearEventoForm() {
       {error && <p style={{ color: "red" }}>{error}</p>}
       {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
     </form>
+    </div>
   );
 }
