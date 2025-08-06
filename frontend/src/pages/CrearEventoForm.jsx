@@ -106,6 +106,16 @@ export default function CrearEventoForm() {
 
   return (
     <div className="container">
+      <div style={{
+        width: '100%',
+        height: '220px',
+        backgroundImage: 'url(https://media.c5n.com/p/a645f8e43d84068723caba1fe0e042d6/adjuntos/326/imagenes/000/288/0000288606/790x0/smart/4b96be81c6e9a408ca62ba5f696298f8345b6fdcjpg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderRadius: '18px',
+        marginBottom: '2rem',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.15)'
+      }} />
       <div className="section">
         <div className="text-center mb-2xl">
           <h1>Crear Nuevo Evento</h1>

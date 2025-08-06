@@ -62,6 +62,16 @@ export default function BuscarEventos() {
 
   return (
     <div className="container">
+      <div style={{
+        width: '100%',
+        height: '220px',
+        backgroundImage: 'url(https://indiehoy.com/wp-content/uploads/2018/09/49-cutcopy_matiascasalh-7.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderRadius: '18px',
+        marginBottom: '2rem',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.15)'
+      }} />
       <div className="section">
         <div className="text-center mb-2xl">
           <h1>Buscar Eventos</h1>

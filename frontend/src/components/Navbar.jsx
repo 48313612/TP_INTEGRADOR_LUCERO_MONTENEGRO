@@ -11,7 +11,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="container navbar-container">
-        <Link to="/" className="navbar-brand">EventApp</Link>
+        <Link to="/" className="navbar-brand">SoulEvents</Link>
         <ul className="navbar-nav">
           <li><Link to="/" className="nav-link">Home</Link></li>
           <li><Link to="/AutenticacionUser" className="nav-link">Autenticarme</Link></li>

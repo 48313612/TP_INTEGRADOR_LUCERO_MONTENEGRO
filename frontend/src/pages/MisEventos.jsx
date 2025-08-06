@@ -98,6 +98,16 @@ export default function MisEventos() {
 
   return (
     <div className="container">
+      <div style={{
+        width: '100%',
+        height: '220px',
+        backgroundImage: 'url(https://aablog.b-cdn.net/wp-content/uploads/2017/01/recitales-2017.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderRadius: '18px',
+        marginBottom: '2rem',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.15)'
+      }} />
       <div className="section">
         <div className="text-center mb-2xl">
           <h1>Mis Eventos</h1>

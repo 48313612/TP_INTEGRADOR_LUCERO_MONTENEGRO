@@ -18,29 +18,23 @@ export default function AutenticacionUser() {
           <div className="card">
             <div className="flex justify-center mb-xl">
               <div className="flex bg-gray-100 rounded-lg p-sm">
-                <button 
-                  onClick={() => setModo("login")} 
-                  className={`px-lg py-sm rounded-md transition-all ${
-                    modo === "login" 
-                      ? "bg-white text-gray-900 shadow-sm" 
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Iniciar Sesión
-                </button>
-                <button 
-                  onClick={() => setModo("registro")} 
-                  className={`px-lg py-sm rounded-md transition-all ${
-                    modo === "registro" 
-                      ? "bg-white text-gray-900 shadow-sm" 
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Registrarse
-                </button>
+                {modo === "login" ? (
+                  <button
+                    onClick={() => setModo("registro")}
+                    className="btn btn-ghost"
+                  >
+                    ¿No tienes cuenta? Registrate
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setModo("login")}
+                    className="btn btn-ghost"
+                  >
+                    ¿Ya tienes cuenta? Inicia sesión
+                  </button>
+                )}
               </div>
             </div>
-            
             {modo === "login" ? <Login /> : <Registro />}
           </div>
         </div>
