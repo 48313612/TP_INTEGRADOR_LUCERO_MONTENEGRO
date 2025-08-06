@@ -70,7 +70,10 @@ export default function MisEventos() {
     }
   };
 
-  const handleEditar = (evento) => { setEditandoId(evento.id); setEventoEditado({ ...evento }); };
+  const handleEditar = (evento) => { 
+    setEditandoId(evento.id); 
+    setEventoEditado({ ...evento }); 
+  };
 
   const handleGuardar = async () => {
     const token = localStorage.getItem('token');
@@ -95,43 +98,159 @@ export default function MisEventos() {
 
   return (
     <div className="container">
-      <h1>Mis Eventos</h1>
-
-      {loading ? (
-        <p>Cargando...</p>
-      ) : error ? (
-        <p style={{ color: 'red' }}>{error}</p>
-      ) : eventos.length === 0 ? (
-        <p>No creaste ningún evento aún.</p>
-      ) : (
-        <div className="eventos-grid">
-          {eventos.map((evento) => (
-            <div key={evento.id} className="evento-card">
-              {editandoId === evento.id ? (
-                <div className="formulario">
-                  <input name="name" value={eventoEditado.name} onChange={handleChange} placeholder="Nombre" />
-                  <textarea name="description" value={eventoEditado.description} onChange={handleChange} placeholder="Descripción" />
-                  <input type="date" name="start_date" value={eventoEditado.start_date?.slice(0, 10)} onChange={handleChange} />
-                  <input name="duration_in_minutes" type="number" value={eventoEditado.duration_in_minutes} onChange={handleChange} placeholder="Duración" />
-                  <input name="price" type="number" value={eventoEditado.price} onChange={handleChange} placeholder="Precio" />
-                  <button onClick={handleGuardar}>Guardar</button>
-                  <button onClick={() => setEditandoId(null)}>Cancelar</button>
-                </div>
-              ) : (
-                <>
-                  <h3>{evento.name}</h3>
-                  <p>{evento.description}</p>
-                  <p>Fecha: {new Date(evento.start_date).toLocaleDateString()}</p>
-                  <p>Duración: {evento.duration_in_minutes} minutos</p>
-                  <p>Precio: ${evento.price}</p>
-                  <button onClick={() => handleEditar(evento)}>Editar</button>
-                  <button onClick={() => handleEliminar(evento.id)}>Eliminar</button>
-                </>
-              )}
-            </div>
-          ))}
+      <div className="section">
+        <div className="text-center mb-2xl">
+          <h1>Mis Eventos</h1>
+          <p className="text-muted">Gestiona los eventos que has creado</p>
         </div>
-      )}
+
+        {loading ? (
+          <div className="text-center">
+            <div className="loading"></div>
+            <p className="text-muted mt-md">Cargando tus eventos...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center">
+            <div className="card">
+              <h3>Error</h3>
+              <p className="text-red-600">{error}</p>
+            </div>
+          </div>
+        ) : eventos.length === 0 ? (
+          <div className="text-center">
+            <div className="card">
+              <h3>No tienes eventos</h3>
+              <p className="text-muted">Aún no has creado ningún evento.</p>
+              <a href="/CrearEventoForm" className="btn btn-primary mt-lg">
+                Crear mi primer evento
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-xl">
+            {eventos.map((evento) => (
+              <div key={evento.id} className="card">
+                {editandoId === evento.id ? (
+                  <div className="card-body">
+                    <div className="form-group">
+                      <label htmlFor="name" className="form-label">Nombre</label>
+                      <input
+                        id="name"
+                        name="name"
+                        className="form-input"
+                        value={eventoEditado.name}
+                        onChange={handleChange}
+                        placeholder="Nombre del evento"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="description" className="form-label">Descripción</label>
+                      <textarea
+                        id="description"
+                        name="description"
+                        className="form-textarea"
+                        value={eventoEditado.description}
+                        onChange={handleChange}
+                        placeholder="Descripción del evento"
+                        rows="3"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-lg">
+                      <div className="form-group">
+                        <label htmlFor="start_date" className="form-label">Fecha</label>
+                        <input
+                          id="start_date"
+                          type="date"
+                          name="start_date"
+                          className="form-input"
+                          value={eventoEditado.start_date?.slice(0, 10)}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="duration_in_minutes" className="form-label">Duración (min)</label>
+                        <input
+                          id="duration_in_minutes"
+                          name="duration_in_minutes"
+                          type="number"
+                          className="form-input"
+                          value={eventoEditado.duration_in_minutes}
+                          onChange={handleChange}
+                          placeholder="120"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="price" className="form-label">Precio</label>
+                      <input
+                        id="price"
+                        name="price"
+                        type="number"
+                        className="form-input"
+                        value={eventoEditado.price}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        step="0.01"
+                      />
+                    </div>
+                    
+                    <div className="flex gap-md">
+                      <button onClick={handleGuardar} className="btn btn-primary">
+                        Guardar
+                      </button>
+                      <button onClick={() => setEditandoId(null)} className="btn btn-secondary">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="card-header">
+                      <h3 className="card-title">{evento.name}</h3>
+                      <p className="card-subtitle">
+                        {new Date(evento.start_date).toLocaleDateString('es-ES', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    
+                    <div className="card-body">
+                      <p className="mb-lg">{evento.description}</p>
+                      
+                      <div className="flex gap-md mb-lg">
+                        <span className="badge badge-primary">{evento.duration_in_minutes} min</span>
+                        <span className="badge badge-secondary">${evento.price}</span>
+                      </div>
+                      
+                      <div className="flex gap-md">
+                        <button 
+                          onClick={() => handleEditar(evento)} 
+                          className="btn btn-secondary"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          onClick={() => handleEliminar(evento.id)} 
+                          className="btn btn-ghost"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

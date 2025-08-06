@@ -10,14 +10,34 @@ const EventoCard = ({ evento }) => {
   };
 
   return (
-    <div className="evento-card" onClick={handleClick} >
-      <h3>{name}</h3>
-      <p>Descripción: {description}</p>
-      <p>Fecha de inicio: {new Date(start_date).toLocaleString()}</p>
-      <p>Duración: {duration_in_minutes} minutos</p>
-      <p>Precio: ${price}</p>
-      <p>Capacidad máxima: {max_assistance} personas</p>
-      <p>Inscripción habilitada: {enabled_for_enrollment ? 'Sí' : 'No'}</p>
+    <div className="card" onClick={handleClick} style={{ cursor: 'pointer' }}>
+      <div className="card-header">
+        <h3 className="card-title">{name}</h3>
+        <p className="card-subtitle">
+          {new Date(start_date).toLocaleDateString('es-ES', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </p>
+      </div>
+      <div className="card-body">
+        <p>{description}</p>
+        <div className="flex gap-md mt-md flex-wrap items-center">
+          <span className="badge badge-primary">{duration_in_minutes} min</span>
+          <span className="badge badge-secondary">${price}</span>
+          <span className="badge">{max_assistance} personas</span>
+        </div>
+        <p className="text-muted mt-md">
+          Inscripción: {enabled_for_enrollment ? 
+            <span className="text-primary">Habilitada</span> : 
+            <span className="text-secondary">Deshabilitada</span>
+          }
+        </p>
+      </div>
     </div>
   );
 };

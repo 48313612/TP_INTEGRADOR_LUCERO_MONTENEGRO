@@ -105,80 +105,159 @@ export default function CrearEventoForm() {
   };
 
   return (
-    <div>
-    <h1> Creación Evento</h1>
-    <form onSubmit={handleSubmit}>
-      <input
-        name="nombre"
-        placeholder="Nombre"
-        value={formData.nombre}
-        onChange={handleChange}
-      />
-      <textarea
-        name="descripcion"
-        placeholder="Descripción"
-        value={formData.descripcion}
-        onChange={handleChange}
-      />
-      <input
-        type="datetime-local"
-        name="fecha"
-        placeholder="Fecha"
-        value={formData.fecha}
-        onChange={handleChange}
-      />
-      <input
-        type="number"
-        name="duracion"
-        placeholder="Duración (minutos)"
-        value={formData.duracion}
-        onChange={handleChange}
-      />
-      <input
-        type="number"
-        name="precio"
-        placeholder="Precio"
-        value={formData.precio}
-        onChange={handleChange}
-      />
-      <input
-        type="number"
-        name="max_assistance"
-        placeholder="Capacidad máxima"
-        value={formData.max_assistance}
-        onChange={handleChange}
-      />
-      <label>
-        Habilitado para inscripción
-        <input
-          type="checkbox"
-          name="enabled_for_enrollment"
-          checked={formData.enabled_for_enrollment}
-          onChange={handleChange}
-        />
-      </label>
+    <div className="container">
+      <div className="section">
+        <div className="text-center mb-2xl">
+          <h1>Crear Nuevo Evento</h1>
+          <p className="text-muted">Completa los datos para crear un evento increíble</p>
+        </div>
 
-      <select
-        name="id_event_location"
-        value={formData.id_event_location}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Seleccioná una ubicación</option>
-        {ubicaciones.map((loc) => (
-          <option key={loc.id} value={loc.id}>
-            {loc.name} - {loc.full_address}
-          </option>
-        ))}
-      </select>
+        <div className="container-md">
+          <div className="card">
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-2 gap-lg">
+                <div className="form-group">
+                  <label htmlFor="nombre" className="form-label">Nombre del Evento *</label>
+                  <input
+                    id="nombre"
+                    name="nombre"
+                    type="text"
+                    className="form-input"
+                    placeholder="Nombre del evento"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Creando..." : "Crear evento"}
-      </button>
+                <div className="form-group">
+                  <label htmlFor="fecha" className="form-label">Fecha y Hora *</label>
+                  <input
+                    id="fecha"
+                    type="datetime-local"
+                    name="fecha"
+                    className="form-input"
+                    value={formData.fecha}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
-    </form>
+              <div className="form-group">
+                <label htmlFor="descripcion" className="form-label">Descripción</label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  className="form-textarea"
+                  placeholder="Describe tu evento..."
+                  value={formData.descripcion}
+                  onChange={handleChange}
+                  rows="4"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-lg">
+                <div className="form-group">
+                  <label htmlFor="duracion" className="form-label">Duración (minutos) *</label>
+                  <input
+                    id="duracion"
+                    type="number"
+                    name="duracion"
+                    className="form-input"
+                    placeholder="120"
+                    value={formData.duracion}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="precio" className="form-label">Precio *</label>
+                  <input
+                    id="precio"
+                    type="number"
+                    name="precio"
+                    className="form-input"
+                    placeholder="0.00"
+                    step="0.01"
+                    value={formData.precio}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="max_assistance" className="form-label">Capacidad Máxima</label>
+                  <input
+                    id="max_assistance"
+                    type="number"
+                    name="max_assistance"
+                    className="form-input"
+                    placeholder="100"
+                    value={formData.max_assistance}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="id_event_location" className="form-label">Ubicación *</label>
+                <select
+                  id="id_event_location"
+                  name="id_event_location"
+                  className="form-select"
+                  value={formData.id_event_location}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccioná una ubicación</option>
+                  {ubicaciones.map((loc) => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name} - {loc.full_address}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="flex items-center gap-sm">
+                  <input
+                    type="checkbox"
+                    name="enabled_for_enrollment"
+                    checked={formData.enabled_for_enrollment}
+                    onChange={handleChange}
+                    className="rounded"
+                  />
+                  <span>Habilitado para inscripción</span>
+                </label>
+              </div>
+
+              <div className="text-center">
+                <button 
+                  type="submit" 
+                  className="btn btn-primary btn-lg" 
+                  disabled={loading}
+                >
+                  {loading ? "Creando..." : "Crear Evento"}
+                </button>
+              </div>
+
+              {error && (
+                <div className="mt-lg p-md bg-red-50 rounded border border-red-200">
+                  <p className="text-red-600">{error}</p>
+                </div>
+              )}
+              
+              {mensaje && (
+                <div className="mt-lg p-md bg-green-50 rounded border border-green-200">
+                  <p className="text-green-600">{mensaje}</p>
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

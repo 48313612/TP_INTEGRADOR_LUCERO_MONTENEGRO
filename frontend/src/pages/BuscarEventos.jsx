@@ -12,6 +12,7 @@ export default function BuscarEventos() {
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const limite = 6;
 
   const fetchEventos = async () => {
     setLoading(true);
@@ -21,19 +22,24 @@ export default function BuscarEventos() {
       if (startDate) queryParams.append('start_date', startDate);
       if (tag) queryParams.append('tag', tag);
       queryParams.append('page', page);
+      queryParams.append('limit', limite);
 
       const res = await fetch(`http://localhost:3000/api/event?${queryParams.toString()}`);
       const data = await res.json();
 
       if (Array.isArray(data)) {
         setEventos(data);
-        setHasMore(data.length > 0);
-      }
-      else {
+        // Solo hay más páginas si recibimos exactamente el límite de eventos
+        setHasMore(data.length === limite);
+      } else {
         console.error('Error:', data.error || data);
+        setEventos([]);
+        setHasMore(false);
       }
     } catch (error) {
       console.error('Error al cargar eventos:', error);
+      setEventos([]);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -49,61 +55,110 @@ export default function BuscarEventos() {
     fetchEventos();
   };
 
+  // Solo mostrar paginación si:
+  // 1. Hay eventos
+  // 2. Y (hay más páginas O estamos en una página > 1)
+  const mostrarPaginacion = eventos.length > 0 && (hasMore || page > 1);
+
   return (
-    <div className="buscador">
-      <h1>Buscar Eventos</h1>
-      <div className="formBuscar">
-      <form onSubmit={handleFiltrar} className="filtros-form">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-
-        <input
-          type="text"
-          placeholder="Tag"
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-        />
-
-        <button type="submit">Filtrar</button>
-      </form>
-      </div>
-
-      {loading ? (
-        <p>Cargando eventos...</p>
-      ) : eventos.length === 0 ? (
-        <p>No hay eventos disponibles.</p>
-      ) : (
-        <div className="cards-row-container">
-          {eventos.map((evento) => (
-            <EventoCard key={evento.id} evento={evento} />
-          ))}
+    <div className="container">
+      <div className="section">
+        <div className="text-center mb-2xl">
+          <h1>Buscar Eventos</h1>
+          <p className="text-muted">Encuentra eventos que se adapten a tus intereses</p>
         </div>
-      )}
 
-      <div className="paginacion-botones">
-        <button
-          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-          disabled={page === 1}
-        >
-          Anterior
-        </button>
-        <span style={{ margin: '0 10px' }}>Página {page}</span>
-        <button
-          onClick={() => setPage((prev) => prev + 1)}
-          disabled={!hasMore || eventos.length === 0}
-        >
-          Siguiente
-        </button>
+        {/* Filtros */}
+        <div className="card mb-2xl">
+          <form onSubmit={handleFiltrar}>
+            <div className="grid grid-cols-3 gap-lg">
+              <div className="form-group">
+                <label htmlFor="name" className="form-label">Nombre del Evento</label>
+                <input
+                  id="name"
+                  type="text"
+                  className="form-input"
+                  placeholder="Buscar por nombre..."
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="startDate" className="form-label">Fecha</label>
+                <input
+                  id="startDate"
+                  type="date"
+                  className="form-input"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tag" className="form-label">Etiqueta</label>
+                <input
+                  id="tag"
+                  type="text"
+                  className="form-input"
+                  placeholder="Buscar por etiqueta..."
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="text-center">
+              <button type="submit" className="btn btn-primary">
+                Buscar Eventos
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Resultados */}
+        {loading ? (
+          <div className="text-center">
+            <div className="loading"></div>
+            <p className="text-muted mt-md">Buscando eventos...</p>
+          </div>
+        ) : eventos.length === 0 ? (
+          <div className="text-center">
+            <div className="card">
+              <h3>No se encontraron eventos</h3>
+              <p className="text-muted">Intenta ajustar los filtros de búsqueda.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-xl">
+            {eventos.map((evento) => (
+              <EventoCard key={evento.id} evento={evento} />
+            ))}
+          </div>
+        )}
+
+        {/* Paginación */}
+        {mostrarPaginacion && (
+          <div className="flex justify-center gap-md mt-2xl">
+            <button
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              className="btn btn-secondary"
+              disabled={page === 1}
+            >
+              Anterior
+            </button>
+            <span className="flex items-center px-md">
+              Página {page}
+            </span>
+            <button
+              onClick={() => setPage((prev) => prev + 1)}
+              className="btn btn-secondary"
+              disabled={!hasMore || eventos.length < limite}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

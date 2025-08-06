@@ -9,13 +9,18 @@ import '../css/styles.css';
 
 function Navbar() {
   return (
-    <nav>
-      <Link to="/"> Home</Link>
-      <Link to="/AutenticacionUser">Autenticarme</Link>
-      <Link to="/BuscarEventos">Buscar Eventos</Link>
-      <Link to="/Ubicaciones">Ubicaciones</Link>
-      <Link to="/CrearEventoForm">Crear Evento</Link>
-      <Link to="/MisEventos">Mis Eventos</Link>
+    <nav className="navbar">
+      <div className="container navbar-container">
+        <Link to="/" className="navbar-brand">EventApp</Link>
+        <ul className="navbar-nav">
+          <li><Link to="/" className="nav-link">Home</Link></li>
+          <li><Link to="/AutenticacionUser" className="nav-link">Autenticarme</Link></li>
+          <li><Link to="/BuscarEventos" className="nav-link">Buscar Eventos</Link></li>
+          <li><Link to="/Ubicaciones" className="nav-link">Ubicaciones</Link></li>
+          <li><Link to="/CrearEventoForm" className="nav-link">Crear Evento</Link></li>
+          <li><Link to="/MisEventos" className="nav-link">Mis Eventos</Link></li>
+        </ul>
+      </div>
     </nav>
   );
 }

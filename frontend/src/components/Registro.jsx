@@ -20,6 +20,7 @@ export default function Registro() {
 
   const [errorGeneral, setErrorGeneral] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const detectarCambios = (e) => {
@@ -38,6 +39,7 @@ export default function Registro() {
     e.preventDefault();
     setErrorGeneral("");
     setSuccessMsg("");
+    setLoading(true);
 
     const validoNombre = validarTexto(datos.nombre);
     const validoApellido = validarTexto(datos.apellido);
@@ -51,7 +53,10 @@ export default function Registro() {
       password: !validopassword,
     });
 
-    if (!validoNombre || !validoApellido || !validoEmail || !validopassword) return;
+    if (!validoNombre || !validoApellido || !validoEmail || !validopassword) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await axios.post('http://localhost:3000/api/user/register', {
@@ -73,67 +78,117 @@ export default function Registro() {
       } else {
         setErrorGeneral("Error de conexión con el servidor");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="form-wrapper">
-      <div className="form-box">
-      <h1>Registro</h1>
+    <div className="container">
+      <div className="section">
+        <div className="container-sm">
+          <div className="card">
+            <div className="text-center mb-xl">
+              <h1>Registro</h1>
+              <p className="text-muted">Crea tu cuenta para comenzar</p>
+            </div>
 
-      {errorGeneral && <p style={{ color: "red" }}>{errorGeneral}</p>}
-      {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
+            {errorGeneral && (
+              <div className="mb-lg p-md bg-red-50 rounded border border-red-200">
+                <p className="text-red-600">{errorGeneral}</p>
+              </div>
+            )}
+            
+            {successMsg && (
+              <div className="mb-lg p-md bg-green-50 rounded border border-green-200">
+                <p className="text-green-600">{successMsg}</p>
+              </div>
+            )}
 
-      <form onSubmit={enviarFormulario}>
-        <label>Nombre</label>
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre"
-          value={datos.nombre}
-          onChange={detectarCambios}
-          required
-        />
-        {errores.nombre && <p style={{ color: "red" }}>Ingrese un nombre válido.</p>}
+            <form onSubmit={enviarFormulario}>
+              <div className="grid grid-cols-2 gap-lg">
+                <div className="form-group">
+                  <label htmlFor="nombre" className="form-label">Nombre</label>
+                  <input
+                    id="nombre"
+                    type="text"
+                    name="nombre"
+                    className="form-input"
+                    placeholder="Tu nombre"
+                    value={datos.nombre}
+                    onChange={detectarCambios}
+                    required
+                  />
+                  {errores.nombre && (
+                    <p className="text-red-600 text-sm mt-sm">Ingrese un nombre válido.</p>
+                  )}
+                </div>
 
-        <label>Apellido</label>
-        <input
-          type="text"
-          name="apellido"
-          placeholder="Apellido"
-          value={datos.apellido}
-          onChange={detectarCambios}
-          required
-        />
-        {errores.apellido && <p style={{ color: "red" }}>Ingrese un apellido válido.</p>}
+                <div className="form-group">
+                  <label htmlFor="apellido" className="form-label">Apellido</label>
+                  <input
+                    id="apellido"
+                    type="text"
+                    name="apellido"
+                    className="form-input"
+                    placeholder="Tu apellido"
+                    value={datos.apellido}
+                    onChange={detectarCambios}
+                    required
+                  />
+                  {errores.apellido && (
+                    <p className="text-red-600 text-sm mt-sm">Ingrese un apellido válido.</p>
+                  )}
+                </div>
+              </div>
 
-        <label>Correo Electrónico</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          value={datos.email}
-          onChange={detectarCambios}
-          required
-        />
-        {errores.email && <p style={{ color: "red" }}>Ingrese un correo electrónico válido.</p>}
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">Correo Electrónico</label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  className="form-input"
+                  placeholder="tu@email.com"
+                  value={datos.email}
+                  onChange={detectarCambios}
+                  required
+                />
+                {errores.email && (
+                  <p className="text-red-600 text-sm mt-sm">Ingrese un correo electrónico válido.</p>
+                )}
+              </div>
 
-        <label>Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          value={datos.password}
-          onChange={detectarCambios}
-          required
-        />
-        {errores.password && <p style={{ color: "red" }}>La password debe tener al menos 6 caracteres.</p>}
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">Contraseña</label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  className="form-input"
+                  placeholder="Tu contraseña"
+                  value={datos.password}
+                  onChange={detectarCambios}
+                  required
+                />
+                {errores.password && (
+                  <p className="text-red-600 text-sm mt-sm">La contraseña debe tener al menos 6 caracteres.</p>
+                )}
+              </div>
 
-        <button type="submit" style={{ marginTop: 10 }}>
-          Registrarme
-        </button>
-      </form>
-    </div>
+              <div className="text-center">
+                <button 
+                  type="submit" 
+                  className="btn btn-primary btn-lg w-full"
+                  disabled={loading}
+                >
+                  {loading ? "Registrando..." : "Registrarme"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

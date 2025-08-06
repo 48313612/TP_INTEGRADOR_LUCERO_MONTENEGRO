@@ -8,6 +8,7 @@ export default function DetalleEvento() {
   const [evento, setEvento] = useState(null);
   const [error, setError] = useState('');
   const [inscripto, setInscripto] = useState(false);
+  const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
 
@@ -21,6 +22,8 @@ export default function DetalleEvento() {
         setInscripto(res.data.user_enrolled || false);
       } catch (err) {
         setError('Error al obtener el evento');
+      } finally {
+        setLoading(false);
       }
     };
     fetchEvento();
@@ -58,7 +61,36 @@ export default function DetalleEvento() {
     }
   };
 
-  if (!evento) return <div>Cargando evento...</div>;
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="section">
+          <div className="text-center">
+            <div className="loading"></div>
+            <p className="text-muted mt-md">Cargando evento...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!evento) {
+    return (
+      <div className="container">
+        <div className="section">
+          <div className="text-center">
+            <div className="card">
+              <h3>Evento no encontrado</h3>
+              <p className="text-muted">El evento que buscas no existe o ha sido eliminado.</p>
+              <button onClick={() => navigate('/')} className="btn btn-primary mt-lg">
+                Volver al Inicio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const {
     name,
@@ -74,30 +106,99 @@ export default function DetalleEvento() {
   const esCreador = creator_user?.id === Number(userId);
 
   return (
-    <div className="detalle-container">
-      <button className="volver" onClick={() => navigate('/')}>Volver</button>
-      <h2>{name}</h2>
-      <p><strong>Descripción:</strong> {description}</p>
-      <p><strong>Fecha:</strong> {new Date(start_date).toLocaleString()}</p>
-      <p><strong>Duración:</strong> {duration_in_minutes} minutos</p>
-      <p><strong>Precio:</strong> ${price}</p>
-      <p><strong>Tags:</strong> {tags && tags.map(tag => tag.name).join(', ')}</p>
-      <p><strong>Provincia:</strong> {event_location?.location?.province?.name}</p>
-      <p><strong>Localidad:</strong> {event_location?.location?.name}</p>
-      <p><strong>Dirección:</strong> {event_location?.full_address}</p>
-      <p><strong>Organizado por:</strong> {creator_user?.first_name} {creator_user?.last_name} (@{creator_user?.username})</p>
+    <div className="container">
+      <div className="section">
+        <div className="mb-lg">
+          <button 
+            onClick={() => navigate('/')} 
+            className="btn btn-ghost"
+          >
+            ← Volver
+          </button>
+        </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="grid grid-cols-2 gap-xl">
+          {/* Información Principal */}
+          <div className="card">
+            <div className="card-header">
+              <h1 className="card-title">{name}</h1>
+              <p className="card-subtitle">
+                {new Date(start_date).toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+            
+            <div className="card-body">
+              <p className="mb-lg">{description}</p>
+              
+              <div className="flex gap-md mb-lg">
+                <span className="badge badge-primary">{duration_in_minutes} min</span>
+                <span className="badge badge-secondary">${price}</span>
+                {tags && tags.map(tag => (
+                  <span key={tag.id} className="badge">{tag.name}</span>
+                ))}
+              </div>
 
-      {token && !esCreador && (
-        <button className="btn-inscripcion" onClick={manejarInscripcion}>
-          {inscripto ? 'Cancelar inscripción' : 'Inscribirme'}
-        </button>
-      )}
+              {error && (
+                <div className="p-md bg-red-50 rounded border border-red-200">
+                  <p className="text-red-600">{error}</p>
+                </div>
+              )}
 
-      {token && esCreador && (
-        <p><em>No puedes inscribirte a tu propio evento.</em></p>
-      )}
+              {token && !esCreador && (
+                <button 
+                  className={`btn btn-lg w-full ${inscripto ? 'btn-secondary' : 'btn-primary'}`}
+                  onClick={manejarInscripcion}
+                >
+                  {inscripto ? 'Cancelar inscripción' : 'Inscribirme'}
+                </button>
+              )}
+
+              {token && esCreador && (
+                <div className="p-md bg-blue-50 rounded border border-blue-200">
+                  <p className="text-blue-600">
+                    <em>No puedes inscribirte a tu propio evento.</em>
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Información Adicional */}
+          <div className="space-y-lg">
+            {/* Ubicación */}
+            <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">Ubicación</h3>
+              </div>
+              <div className="card-body">
+                <p><strong>Provincia:</strong> {event_location?.location?.province?.name}</p>
+                <p><strong>Localidad:</strong> {event_location?.location?.name}</p>
+                <p><strong>Dirección:</strong> {event_location?.full_address}</p>
+              </div>
+            </div>
+
+            {/* Organizador */}
+            <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">Organizador</h3>
+              </div>
+              <div className="card-body">
+                <p>
+                  <strong>{creator_user?.first_name} {creator_user?.last_name}</strong>
+                </p>
+                <p className="text-muted">@{creator_user?.username}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
