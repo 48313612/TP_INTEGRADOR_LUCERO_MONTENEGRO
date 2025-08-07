@@ -20,8 +20,15 @@ export default function DetalleEvento() {
         });
         setEvento(res.data);
         setInscripto(res.data.user_enrolled || false);
+        setError('');
       } catch (err) {
-        setError('Error al obtener el evento');
+        console.error('Error fetching event:', err);
+        if (err.response?.status === 404) {
+          setError('Evento no encontrado');
+        } else {
+          setError('Error al obtener el evento');
+        }
+        setEvento(null);
       } finally {
         setLoading(false);
       }
@@ -101,6 +108,8 @@ export default function DetalleEvento() {
     creator_user,
     event_location,
     tags,
+    enrollments,
+    enabled_for_enrollment,
   } = evento;
 
   const esCreador = creator_user?.id === Number(userId);
@@ -151,13 +160,21 @@ export default function DetalleEvento() {
                 </div>
               )}
 
-              {token && !esCreador && (
+              {token && !esCreador && enabled_for_enrollment && (
                 <button 
                   className={`btn btn-lg w-full ${inscripto ? 'btn-secondary' : 'btn-primary'}`}
                   onClick={manejarInscripcion}
                 >
                   {inscripto ? 'Cancelar inscripción' : 'Inscribirme'}
                 </button>
+              )}
+
+              {token && !esCreador && !enabled_for_enrollment && (
+                <div className="p-md bg-yellow-50 rounded border border-yellow-200">
+                  <p className="text-yellow-600">
+                    <em>Este evento no está habilitado para inscripciones.</em>
+                  </p>
+                </div>
               )}
 
               {token && esCreador && (
@@ -193,9 +210,31 @@ export default function DetalleEvento() {
                 <p>
                   <strong>{creator_user?.first_name} {creator_user?.last_name}</strong>
                 </p>
-                <p className="text-muted">@{creator_user?.username}</p>
+                <p className="text-muted">{creator_user?.username}</p>
               </div>
             </div>
+
+            {/* Usuarios inscriptos */}
+            {enrollments && enrollments.length > 0 && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="card-title">Usuarios inscriptos ({enrollments.length})</h3>
+                </div>
+                <div className="card-body">
+                  <ul className="space-y-sm">
+                    {enrollments.map(user => (
+                      <li key={user.id} className="flex items-center gap-sm">
+                        <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span>
+                          <strong>{user.first_name} {user.last_name}</strong>
+                          <span className="text-muted ml-sm">@{user.username}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

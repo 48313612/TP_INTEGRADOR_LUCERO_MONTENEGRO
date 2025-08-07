@@ -54,8 +54,8 @@ export default class EventService{
     });
   }
 
-  searchEvents = async (filters) => {
-    const rows = await repo.searchEvents(filters);
+  searchEvents = async (filters, page = 1, limit = 10) => {
+    const rows = await repo.searchEvents(filters, page, limit);
     return rows.map(row => {
       const province = new Province({
         id: row.province_id,
@@ -99,7 +99,7 @@ export default class EventService{
     });
   }
 
-  getEventById = async (id) => {
+  getEventById = async (id, userId = null) => {
     const row = await repo.getEventById(id);
     if (!row) return null;
     
@@ -147,6 +147,16 @@ export default class EventService{
       username: row.creator_username,
       password: maskPassword(row.creator_password)
     };
+
+    // Verificar si el usuario está inscrito al evento
+    let userEnrolled = false;
+    if (userId) {
+      const enrollment = await repo.getUserEnrollment(id, userId);
+      userEnrolled = !!enrollment;
+    }
+
+    // Obtener inscriptos
+    const enrollments = await repo.getEventEnrollments(id);
     
     return {
       id: row.id,
@@ -161,7 +171,9 @@ export default class EventService{
       id_creator_user: row.id_creator_user,
       event_location: eventLocation,
       tags: row.tags,
-      creator_user: creatorUser
+      creator_user: creatorUser,
+      enrollments,
+      user_enrolled: userEnrolled
     };
   }
 

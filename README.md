@@ -3,6 +3,9 @@
 ## BACKEND
 ### Instalar
   npm i
+  npm i axios
+  npm i express
+  npm i cors
 ### Correr
   npm run server
 

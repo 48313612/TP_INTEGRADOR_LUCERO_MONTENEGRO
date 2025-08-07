@@ -31,7 +31,7 @@ export default class EventRepository {
     }
   }; 
 
-  searchEvents = async (filters) => {
+  searchEvents = async (filters, page = 1, limit = 10) => {
     try {
       let whereClauses = [];
       let values = [];
@@ -58,6 +58,7 @@ export default class EventRepository {
       }
 
       const where = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
+      const offset = (page - 1) * limit;
 
       const sql = `SELECT 
         e.id as event_id, e.name as event_name, e.description as event_description, e.start_date, e.duration_in_minutes, e.price, 
@@ -72,7 +73,9 @@ export default class EventRepository {
       JOIN locations l ON el.id_location = l.id
       JOIN provinces p ON l.id_province = p.id
       ${where}
-      ORDER BY e.start_date ASC`;
+      ORDER BY e.start_date ASC
+      LIMIT $${idx} OFFSET $${idx + 1}`;
+      values.push(limit, offset);
       const result = await pool.query(sql, values);
       return result.rows;
     } catch (error) {
@@ -84,7 +87,7 @@ export default class EventRepository {
   getEventById = async (id) => {
     try {
       const sql = `SELECT 
-        e.*, 
+        e.id, e.name, e.description, e.start_date, e.duration_in_minutes, e.price, e.enabled_for_enrollment, e.max_assistance, e.id_creator_user, e.id_event_location,
         u.id as creator_user_id, u.first_name as creator_first_name, u.last_name as creator_last_name, u.username as creator_username, u.password as creator_password,
         el.id as event_location_id, el.id_location, el.name as event_location_name, el.full_address, el.max_capacity, el.latitude as event_location_latitude, el.longitude as event_location_longitude, el.id_creator_user as event_location_creator_user,
         l.id as location_id, l.name as location_name, l.id_province, l.latitude as location_latitude, l.longitude as location_longitude,
@@ -93,7 +96,7 @@ export default class EventRepository {
       FROM events e
       JOIN users u ON e.id_creator_user = u.id
       JOIN event_locations el ON e.id_event_location = el.id
-      JOIN users elu ON el.id_creator_user = elu.id
+      LEFT JOIN users elu ON el.id_creator_user = elu.id
       JOIN locations l ON el.id_location = l.id
       JOIN provinces p ON l.id_province = p.id
       WHERE e.id = $1`;
@@ -350,4 +353,15 @@ export default class EventRepository {
       return 0;
     }
   }
+
+  getEventEnrollments = async (eventId) => {
+    const sql = `
+      SELECT u.id, u.first_name, u.last_name, u.username
+      FROM event_enrollments ee
+      JOIN users u ON ee.id_user = u.id
+      WHERE ee.id_event = $1
+    `;
+    const result = await pool.query(sql, [eventId]);
+    return result.rows;
+  };
 }

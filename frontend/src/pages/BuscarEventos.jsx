@@ -19,7 +19,7 @@ export default function BuscarEventos() {
     try {
       const queryParams = new URLSearchParams();
       if (name) queryParams.append('name', name);
-      if (startDate) queryParams.append('start_date', startDate);
+      if (startDate) queryParams.append('startdate', startDate);
       if (tag) queryParams.append('tag', tag);
       queryParams.append('page', page);
       queryParams.append('limit', limite);
@@ -29,8 +29,12 @@ export default function BuscarEventos() {
 
       if (Array.isArray(data)) {
         setEventos(data);
-        // Solo hay más páginas si recibimos exactamente el límite de eventos
+        // Hay más páginas si recibimos exactamente el límite de eventos
         setHasMore(data.length === limite);
+      } else if (data.error) {
+        console.error('Error:', data.error);
+        setEventos([]);
+        setHasMore(false);
       } else {
         console.error('Error:', data.error || data);
         setEventos([]);
@@ -47,17 +51,14 @@ export default function BuscarEventos() {
 
   useEffect(() => {
     fetchEventos();
-  }, [page]);
+  }, [page, name, startDate, tag]);
 
   const handleFiltrar = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchEventos();
   };
 
-  // Solo mostrar paginación si:
-  // 1. Hay eventos
-  // 2. Y (hay más páginas O estamos en una página > 1)
+  // Mostrar paginación si hay eventos y hay más páginas o estamos en una página > 1
   const mostrarPaginacion = eventos.length > 0 && (hasMore || page > 1);
 
   return (
@@ -163,7 +164,7 @@ export default function BuscarEventos() {
             <button
               onClick={() => setPage((prev) => prev + 1)}
               className="btn btn-secondary"
-              disabled={!hasMore || eventos.length < limite}
+              disabled={!hasMore}
             >
               Siguiente
             </button>

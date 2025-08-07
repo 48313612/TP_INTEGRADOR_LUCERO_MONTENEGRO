@@ -1,6 +1,6 @@
 import express from 'express';
 import EventService from '../services/event-service.js';
-import { authenticateToken } from '../middleware/auth-middleware.js';
+import { authenticateToken, optionalAuth } from '../middleware/auth-middleware.js';
 
 const svc = new EventService();
 const router = express.Router();
@@ -17,16 +17,16 @@ router.get('', async (req, res) => {
     events = await svc.getAllEvents(page, limit);
   }
   if (events && events.length > 0) {
-    respuesta = res.status(200).json(events);
+    return res.status(200).json(events);
   } else {
-    respuesta = res.status(200).json({ error: 'Tal evento no está registrado' });
+    return res.status(200).json([]);
   }
-  return respuesta;
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
   const { id } = req.params;
-  const event = await svc.getEventById(id);
+  const userId = req.user?.id || null;
+  const event = await svc.getEventById(id, userId);
   if (event) {
     return res.status(200).json(event);
   } else {

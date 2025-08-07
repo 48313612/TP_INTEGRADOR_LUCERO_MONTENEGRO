@@ -305,6 +305,7 @@ a:hover {
   border-radius: 0.75rem;
   box-shadow: 0 1px 2px 0 rgba(124, 96, 107, 0.05);
   padding: 2rem;
+  margin-bottom: 1rem;
   transition: all 0.3s ease-in-out;
   border: 1px solid var(--champagne-pink);
 }
