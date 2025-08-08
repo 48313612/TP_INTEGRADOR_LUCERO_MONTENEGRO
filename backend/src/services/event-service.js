@@ -99,6 +99,14 @@ export default class EventService{
     });
   }
 
+  countAllEvents = async () => {
+    return await repo.countAllEvents();
+  }
+
+  countSearchEvents = async (filters) => {
+    return await repo.countSearchEvents(filters);
+  }
+
   getEventById = async (id, userId = null) => {
     const row = await repo.getEventById(id);
     if (!row) return null;

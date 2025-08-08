@@ -12,6 +12,7 @@ export default function BuscarEventos() {
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [viewAll, setViewAll] = useState(false);
   const limite = 6;
 
   const fetchEventos = async () => {
@@ -21,16 +22,25 @@ export default function BuscarEventos() {
       if (name) queryParams.append('name', name);
       if (startDate) queryParams.append('startdate', startDate);
       if (tag) queryParams.append('tag', tag);
-      queryParams.append('page', page);
-      queryParams.append('limit', limite);
+      
+      if (viewAll) {
+        queryParams.append('all', 'true');
+      } else {
+        queryParams.append('page', page);
+        queryParams.append('limit', limite);
+      }
 
       const res = await fetch(`http://localhost:3000/api/event?${queryParams.toString()}`);
       const data = await res.json();
 
-      if (Array.isArray(data)) {
-        setEventos(data);
-        // Hay más páginas si recibimos exactamente el límite de eventos
-        setHasMore(data.length === limite);
+      // Handle the new response format
+      if (data.data && Array.isArray(data.data)) {
+        setEventos(data.data);
+        if (!viewAll) {
+          setHasMore(page < data.pagination?.totalPages);
+        } else {
+          setHasMore(false);
+        }
       } else if (data.error) {
         console.error('Error:', data.error);
         setEventos([]);
@@ -51,7 +61,7 @@ export default function BuscarEventos() {
 
   useEffect(() => {
     fetchEventos();
-  }, [page, name, startDate, tag]);
+  }, [page, name, startDate, tag, viewAll]);
 
   const handleFiltrar = (e) => {
     e.preventDefault();

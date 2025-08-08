@@ -6,20 +6,45 @@ const svc = new EventService();
 const router = express.Router();
 
 router.get('', async (req, res) => {
-  let respuesta;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  const { name, startdate, tag } = req.query;
-  let events;
-  if (name || startdate || tag) {
-    events = await svc.searchEvents({ name, startdate, tag }, page, limit);
-  } else {
-    events = await svc.getAllEvents(page, limit);
-  }
-  if (events && events.length > 0) {
-    return res.status(200).json(events);
-  } else {
-    return res.status(200).json([]);
+  const { name, startdate, tag, all } = req.query;
+  
+  try {
+    // If all=true parameter is provided, return all events without pagination
+    if (all === 'true') {
+      const events = await svc.getAllEventsWithoutPagination();
+      return res.status(200).json({
+        data: events,
+        pagination: null
+      });
+    }
+    
+    let events;
+    let totalCount;
+    
+    if (name || startdate || tag) {
+      events = await svc.searchEvents({ name, startdate, tag }, page, limit);
+      totalCount = await svc.countSearchEvents({ name, startdate, tag });
+    } else {
+      events = await svc.getAllEvents(page, limit);
+      totalCount = await svc.countAllEvents();
+    }
+    
+    const totalPages = Math.ceil(totalCount / limit);
+    
+    return res.status(200).json({
+      data: events,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return res.status(500).json({ error: 'Error al obtener eventos' });
   }
 });
 

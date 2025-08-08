@@ -364,4 +364,76 @@ export default class EventRepository {
     const result = await pool.query(sql, [eventId]);
     return result.rows;
   };
+
+  countAllEvents = async () => {
+    try {
+      const sql = `SELECT COUNT(*) FROM events`;
+      const result = await pool.query(sql);
+      return parseInt(result.rows[0].count);
+    } catch (error) {
+      console.log('Error counting all events:', error);
+      throw error;
+    }
+  };
+
+  countSearchEvents = async (filters) => {
+    try {
+      let whereClauses = [];
+      let values = [];
+      let idx = 1;
+
+      if (filters.name) {
+        whereClauses.push(`LOWER(e.name) LIKE LOWER($${idx})`);
+        values.push(`%${filters.name}%`);
+        idx++;
+      }
+      if (filters.startdate) {
+        whereClauses.push(`CAST(e.start_date AS DATE) = $${idx}`);
+        values.push(filters.startdate);
+        idx++;
+      }
+      if (filters.tag) {
+        whereClauses.push(`EXISTS (
+          SELECT 1 FROM event_tags et
+          JOIN tags t ON et.id_tag = t.id
+          WHERE et.id_event = e.id AND LOWER(t.name) = LOWER($${idx})
+        )`);
+        values.push(filters.tag);
+        idx++;
+      }
+
+      const where = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
+
+      const sql = `SELECT COUNT(*) FROM events e ${where}`;
+      const result = await pool.query(sql, values);
+      return parseInt(result.rows[0].count);
+    } catch (error) {
+      console.log('Error counting search events:', error);
+      throw error;
+    }
+  };
+
+  getAllEventsWithoutPagination = async () => {
+    try {
+      const sql = `SELECT 
+        e.id as event_id, e.name as event_name, e.description as event_description, e.start_date, e.duration_in_minutes, e.price, 
+        e.enabled_for_enrollment, e.max_assistance,
+        u.id as user_id, u.first_name, u.last_name, u.username,
+        el.id as event_location_id, el.id_location, el.full_address,
+        l.id as location_id, l.name as location_name, l.latitude, l.longitude, l.id_province,
+        p.id as province_id, p.name as province_name, p.full_name as province_full_name, p.latitude as province_latitude, p.longitude as province_longitude
+      FROM events e
+      JOIN users u ON e.id_creator_user = u.id
+      JOIN event_locations el ON e.id_event_location = el.id
+      JOIN locations l ON el.id_location = l.id
+      JOIN provinces p ON l.id_province = p.id
+      ORDER BY e.start_date ASC
+    `;
+      const result = await pool.query(sql);
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
 }
