@@ -4,7 +4,7 @@ const {Client, Pool} = pkg;
 
 
 export default class EventRepository {
-  getAllEvents = async (page = 1, limit = 10) => {
+   getAllEvents = async (page = 1, limit = 10) => {
     try {
       const offset = (page - 1) * limit;
       const sql = `SELECT 
@@ -21,15 +21,38 @@ export default class EventRepository {
       JOIN provinces p ON l.id_province = p.id
       ORDER BY e.start_date ASC
       LIMIT $1 OFFSET $2
-    `;
-    const result = await pool.query(sql, [limit, offset]);
-    return result.rows;
-    } 
-    catch (error) {
+      `;
+      const result = await pool.query(sql, [limit, offset]);
+      const events = result.rows;
+
+      // Obtener los tags para todos los eventos
+      const eventIds = events.map(ev => ev.event_id);
+      let tagsMap = {};
+      if (eventIds.length > 0) {
+        const tagsSql = `
+          SELECT et.id_event, t.id, t.name
+          FROM event_tags et
+          JOIN tags t ON et.id_tag = t.id
+          WHERE et.id_event = ANY($1)
+        `;
+        const tagsResult = await pool.query(tagsSql, [eventIds]);
+        tagsMap = tagsResult.rows.reduce((acc, tag) => {
+          if (!acc[tag.id_event]) acc[tag.id_event] = [];
+          acc[tag.id_event].push({ id: tag.id, name: tag.name });
+          return acc;
+        }, {});
+      }
+
+      // Agregar los tags a cada evento
+      return events.map(ev => ({
+        ...ev,
+        tags: tagsMap[ev.event_id] || []
+      }));
+    } catch (error) {
       console.log(error);
       throw error;
     }
-  }; 
+  };
 
   searchEvents = async (filters, page = 1, limit = 10) => {
     try {
@@ -77,7 +100,31 @@ export default class EventRepository {
       LIMIT $${idx} OFFSET $${idx + 1}`;
       values.push(limit, offset);
       const result = await pool.query(sql, values);
-      return result.rows;
+      const events = result.rows;
+
+      // Obtener los tags para todos los eventos filtrados
+      const eventIds = events.map(ev => ev.event_id);
+      let tagsMap = {};
+      if (eventIds.length > 0) {
+        const tagsSql = `
+          SELECT et.id_event, t.id, t.name
+          FROM event_tags et
+          JOIN tags t ON et.id_tag = t.id
+          WHERE et.id_event = ANY($1)
+        `;
+        const tagsResult = await pool.query(tagsSql, [eventIds]);
+        tagsMap = tagsResult.rows.reduce((acc, tag) => {
+          if (!acc[tag.id_event]) acc[tag.id_event] = [];
+          acc[tag.id_event].push({ id: tag.id, name: tag.name });
+          return acc;
+        }, {});
+      }
+
+      // Agregar los tags a cada evento
+      return events.map(ev => ({
+        ...ev,
+        tags: tagsMap[ev.event_id] || []
+      }));
     } catch (error) {
       console.log(error);
       throw error;
@@ -87,30 +134,43 @@ export default class EventRepository {
   getEventById = async (id) => {
     try {
       const sql = `SELECT 
-        e.id, e.name, e.description, e.start_date, e.duration_in_minutes, e.price, e.enabled_for_enrollment, e.max_assistance, e.id_creator_user, e.id_event_location,
-        u.id as creator_user_id, u.first_name as creator_first_name, u.last_name as creator_last_name, u.username as creator_username, u.password as creator_password,
-        el.id as event_location_id, el.id_location, el.name as event_location_name, el.full_address, el.max_capacity, el.latitude as event_location_latitude, el.longitude as event_location_longitude, el.id_creator_user as event_location_creator_user,
-        l.id as location_id, l.name as location_name, l.id_province, l.latitude as location_latitude, l.longitude as location_longitude,
-        p.id as province_id, p.name as province_name, p.full_name as province_full_name, p.latitude as province_latitude, p.longitude as province_longitude, p.display_order,
-        elu.id as event_location_creator_id, elu.first_name as event_location_creator_first_name, elu.last_name as event_location_creator_last_name, elu.username as event_location_creator_username, elu.password as event_location_creator_password
+        e.id as event_id, e.name as event_name, e.description as event_description, e.start_date, e.duration_in_minutes, e.price, 
+        e.enabled_for_enrollment, e.max_assistance,
+        u.id as user_id, u.first_name, u.last_name, u.username,
+        el.id as event_location_id, el.id_location, el.full_address,
+        l.id as location_id, l.name as location_name, l.latitude, l.longitude, l.id_province,
+        p.id as province_id, p.name as province_name, p.full_name as province_full_name, p.latitude as province_latitude, p.longitude as province_longitude
       FROM events e
       JOIN users u ON e.id_creator_user = u.id
       JOIN event_locations el ON e.id_event_location = el.id
-      LEFT JOIN users elu ON el.id_creator_user = elu.id
       JOIN locations l ON el.id_location = l.id
       JOIN provinces p ON l.id_province = p.id
-      WHERE e.id = $1`;
+      WHERE e.id = $1
+      `;
       const result = await pool.query(sql, [id]);
-      if (result.rows.length === 0) return null;
-      const tagsSql = `SELECT t.id, t.name FROM event_tags et JOIN tags t ON et.id_tag = t.id WHERE et.id_event = $1`;
+      const event = result.rows[0];
+      if (!event) return null;
+
+      // Obtener los tags para el evento
+      const tagsSql = `
+        SELECT t.id, t.name
+        FROM event_tags et
+        JOIN tags t ON et.id_tag = t.id
+        WHERE et.id_event = $1
+      `;
       const tagsResult = await pool.query(tagsSql, [id]);
-      return { ...result.rows[0], tags: tagsResult.rows };
+      const tags = tagsResult.rows.map(tag => ({ id: tag.id, name: tag.name }));
+
+      return {
+        ...event,
+        tags
+      };
     } catch (error) {
       console.log(error);
       throw error;
     }
-  }
-
+  };
+  
   getEventLocationById = async (id) => {
     try {
       const sql = `SELECT * FROM event_locations WHERE id = $1`;

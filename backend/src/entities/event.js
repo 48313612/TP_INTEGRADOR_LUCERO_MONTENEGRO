@@ -1,5 +1,5 @@
 class Event{
-    constructor({ id, name, description, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, creator_user, event_location }) {
+    constructor({ id, name, description, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, creator_user, event_location, tags }) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -8,8 +8,8 @@ class Event{
         this.price = price;
         this.enabled_for_enrollment = enabled_for_enrollment;
         this.max_assistance = max_assistance;
+        this.tags = tags || [];
         
-        // Simplify creator_user object to show only required fields
         this.creator_user = {
             id: creator_user.id,
             first_name: creator_user.first_name,

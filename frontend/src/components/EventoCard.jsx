@@ -27,10 +27,19 @@ const EventoCard = ({ evento }) => {
       <div className="card-body">
         <p>{description}</p>
         <div className="flex gap-md mt-md flex-wrap items-center">
-          <span className="badge badge-primary">{duration_in_minutes} min</span>
-          <span className="badge badge-secondary">${price}</span>
-          <span className="badge">{max_assistance} personas</span>
-        </div>
+  <span className="badge badge-primary">{duration_in_minutes} min</span>
+  <span className="badge badge-secondary">${price}</span>
+  <span className="badge">{max_assistance} personas</span>
+</div>
+{evento.tags && evento.tags.length > 0 && (
+  <div className="evento-tags mt-md">
+    {evento.tags.map(tag => (
+      <span key={tag.id} className="evento-tag">
+        {tag.name}
+      </span>
+    ))}
+  </div>
+)}
         <p className="text-muted mt-md">
           Inscripción: {enabled_for_enrollment ? 
             <span className="text-primary">Habilitada</span> : 

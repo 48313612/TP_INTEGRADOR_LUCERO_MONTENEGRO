@@ -49,7 +49,8 @@ export default class EventService{
         enabled_for_enrollment: row.enabled_for_enrollment,
         max_assistance: row.max_assistance,
         creator_user: user,
-        event_location: eventLocation
+        event_location: eventLocation,
+        tags: row.tags 
       });
     });
   }
@@ -94,7 +95,8 @@ export default class EventService{
         enabled_for_enrollment: row.enabled_for_enrollment,
         max_assistance: row.max_assistance,
         creator_user: user,
-        event_location: eventLocation
+        event_location: eventLocation,
+         tags: row.tags 
       });
     });
   }

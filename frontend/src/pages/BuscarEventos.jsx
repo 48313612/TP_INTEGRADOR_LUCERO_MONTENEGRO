@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import EventoCard from '../components/EventoCard';
+import { ListEventos } from '../components/ListEventos';
 import '../css/styles.css';
 
 export default function BuscarEventos() {
@@ -68,8 +68,6 @@ export default function BuscarEventos() {
     setPage(1);
   };
 
-  // Mostrar paginación si hay eventos y hay más páginas o estamos en una página > 1
-  const mostrarPaginacion = eventos.length > 0 && (hasMore || page > 1);
 
   return (
     <div className="container">
@@ -151,34 +149,7 @@ export default function BuscarEventos() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-xl">
-            {eventos.map((evento) => (
-              <EventoCard key={evento.id} evento={evento} />
-            ))}
-          </div>
-        )}
-
-        {/* Paginación */}
-        {mostrarPaginacion && (
-          <div className="flex justify-center gap-md mt-2xl">
-            <button
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              className="btn btn-secondary"
-              disabled={page === 1}
-            >
-              Anterior
-            </button>
-            <span className="flex items-center px-md">
-              Página {page}
-            </span>
-            <button
-              onClick={() => setPage((prev) => prev + 1)}
-              className="btn btn-secondary"
-              disabled={!hasMore}
-            >
-              Siguiente
-            </button>
-          </div>
+           <ListEventos eventos={eventos} />
         )}
       </div>
     </div>
