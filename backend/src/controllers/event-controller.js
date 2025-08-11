@@ -13,7 +13,7 @@ router.get('', async (req, res) => {
   try {
     // If all=true parameter is provided, return all events without pagination
     if (all === 'true') {
-      const events = await svc.getAllEventsWithoutPagination();
+      const events = await svc.getAllEvents();
       return res.status(200).json({
         data: events,
         pagination: null

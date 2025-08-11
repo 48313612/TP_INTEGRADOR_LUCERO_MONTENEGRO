@@ -119,7 +119,7 @@ export default function DetalleEvento() {
       <div className="section">
         <div className="mb-lg">
           <button 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/BuscarEventos')} 
             className="btn btn-ghost"
           >
             ← Volver
@@ -226,8 +226,8 @@ export default function DetalleEvento() {
                       <li key={user.id} className="flex items-center gap-sm">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                         <span>
-                          <strong>{user.first_name} {user.last_name}</strong>
-                          <span className="text-muted ml-sm">@{user.username}</span>
+                          <strong>{user.first_name} {user.last_name}: </strong>
+                          <span className="text-muted ml-sm">{user.username}</span>
                         </span>
                       </li>
                     ))}

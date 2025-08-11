@@ -11,9 +11,12 @@ export default function Home() {
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/event')
-        if (Array.isArray(response.data)) {
-          setEventos(response.data.slice(0, 6)); // Mostrar solo los primeros 6 eventos
+        const response = await axios.get('http://localhost:3000/api/event?all=true')
+        if (response.data && Array.isArray(response.data.data)) {
+          setEventos(response.data.data.slice(0, 6)); // Mostrar solo los primeros 6 eventos
+        } else if (Array.isArray(response.data)) {
+          // Fallback for direct array response
+          setEventos(response.data.slice(0, 6));
         } else {
           console.error('Respuesta inesperada del servidor:', response.data);
         }
